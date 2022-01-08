@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="fd1543e8-022c-4a79-8de5-dcf50d113990" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CSS File" />
+        <option value="JavaScript File" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1aPvjTolPmWOUacVi36O3iOKPFd" />
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\vue\example1" />
+      <recent name="E:\vue\example1\img" />
+      <recent name="E:\vue\example1\js" />
+      <recent name="E:\vue\example1\css" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\vue\example1\dist" />
+      <recent name="E:\vue\example1" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fd1543e8-022c-4a79-8de5-dcf50d113990" name="Default Changelist" comment="" />
+      <created>1586650178160</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1586650178160</updated>
+      <workItem from="1586650180940" duration="28194000" />
+      <workItem from="1586763343841" duration="32276000" />
+      <workItem from="1587364178231" duration="9192000" />
+      <workItem from="1587382751640" duration="50237000" />
+      <workItem from="1588304045594" duration="1822000" />
+      <workItem from="1588382801432" duration="54767000" />
+      <workItem from="1588845419977" duration="259000" />
+      <workItem from="1589181328019" duration="4746000" />
+      <workItem from="1589583973230" duration="17196000" />
+      <workItem from="1589612778013" duration="19364000" />
+      <workItem from="1589675510478" duration="14664000" />
+      <workItem from="1589770172217" duration="39835000" />
+      <workItem from="1590209788999" duration="257000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+</project>

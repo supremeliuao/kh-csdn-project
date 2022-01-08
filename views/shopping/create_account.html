@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--注册</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="../../js/vue.js"></script>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <script src="../../layui/layui.js"></script>
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        #Vue{
+            height: 100%;
+            position: relative;
+        }
+        #container{
+            height: 40vw;
+            width: 100%;
+        }
+        header{
+            position: absolute;
+            width: 100%;
+            z-index: 2;
+            opacity: 0.5;
+        }
+        .register{
+            position: absolute;
+            height: 40vw;
+            width: 40vw;
+            right: 0;
+            left: 0;
+            bottom:2vw;
+            margin: auto;
+            z-index: 2;
+            background: rgba(57,61,73,0.5);
+            border-radius: 5px;
+            box-shadow: 0 1px 10px rgba(255,255,255,0.8);
+        }
+        .login_register_text{
+            color: rgba(220,220,220,0.5);
+            font-weight: lighter;
+            margin: 2.5vw 1vw;
+            position: relative;
+        }
+        .login_text{
+            font-size: 2em;
+        }
+        .input_div{
+            position: relative;
+            margin: 4vw  1vw;
+        }
+        .common_input{
+            background: transparent;
+            width: 100%;
+            padding: 0.4em 0.25em;
+            color: rgba(255,255,255,0.8);
+            font-size: 1.5em;
+            border:0;
+            outline: none;
+            font-family: "幼圆";
+            /*transition: transform 0.3s;*/
+        }
+
+        .common_input:focus + .input_label >.input_label_content{
+            display: none;
+            transition:all ease-out 2s;
+        }
+
+        .common_input:focus + .input_label:after{
+            transform: scaleX(1.06);
+            transition: all ease-out 0.5s;
+        }
+        .input_label{
+            position: absolute;
+            top:0;
+            width: 100%;
+            text-align: left;
+            pointer-events: none;/*元素不再是鼠标事件的目标，鼠标不再监听当前层而去监听下面的层中的元素。但是如果它的子元素设置了pointer-events为其它值，比如auto，鼠标还是会监听这个子元素的*/
+            transition: transform 0.3s;
+            height: 30px;
+            line-height: 30px;
+        }
+        .input_label:before{
+            top:0;
+        }
+        .input_label:after{
+            bottom: 0;
+            left: 0;
+        }
+        .input_label:after{
+            content: '';
+            position: absolute;
+            z-index: -1;
+            width: 95%;
+            height: 3px;
+            background:rgba(0,206,209,0.8);
+            transition: all ease-out 0.5s;
+        }
+
+        .input_label_content{
+            transition: all ease-out 0.3s;
+            color: rgba(220,220,220,0.8);
+            font-size: 1.2em;
+            font-family: "幼圆";
+            font-weight: lighter;
+        }
+        .tip_input{
+            float: right;
+            font-family: "幼圆";
+            color: rgba(219,112,147,0.8);
+        }
+        .login_botton{
+            margin: 2.5vw 1vw;
+        }
+        .login_botton>button{
+            width: 100%;
+            padding: 0.8vw;
+            color:rgba(220,220,220,0.8);
+            background-color:rgba(0,206,209,0.5);
+            border-radius: 3px;
+            border-width: 0;
+            margin: 0;
+            outline: none;
+            font-size: 15px;
+            font-weight: lighter;
+            text-align: center;
+            cursor: pointer;
+        }
+        .Copyright{
+            position: absolute;
+            bottom:1vw;
+            text-align: center;
+            width: 100%;
+            font-family: "幼圆";
+            color: rgba(220,220,220,0.5);
+        }
+    </style>
+</head>
+<body>
+<div id="Vue">
+    <header>
+        <ul class="layui-nav layui-bg-black">
+            <li class="layui-nav-item" style="background: rgba(0,206,209,0.8)"><a href="#" v-on:Click="backIndex">首页</a> </li>
+        </ul>
+    </header>
+   <threes></threes>
+
+    <div class="register" id="register">
+        <div class="layui-fluid" >
+            <div class="layui-col-lg12">
+                <div class="login_register_text">
+                    <div class="login_text">{{register_text}}</div>
+                </div>
+                <input-style message="账号" id="input_account" type="text" charlenght="10"></input-style>
+                <input-style message="密码" id="input_password" type="password" charlenght="8"></input-style>
+                <input-style message="邮箱" id="input_email" type="email" charlenght="12"></input-style>
+                <div class="login_botton">
+                    <button>{{register_text}}</button>
+                </div>
+            </div>
+        </div>
+        <div class="Copyright">
+            Copyright © 2020 Kinghiee. All rights reserved
+        </div>
+    </div>
+</div>
+<script type="x-shader/x-vertex" id="vertexshader">
+           //使用ShaderMaterial类，顶点位置变量position无需声明，顶点着色器可以直接调用
+           //modelViewMatrix:模型视图矩阵,内置变量
+           //projectionMatrix:投影矩阵属性,内置变量
+			attribute float scale;
+
+			void main() {
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_PointSize = scale * ( 300.0 / - mvPosition.z );
+
+				gl_Position = projectionMatrix * mvPosition;//第一行和本行代码的目的是坐标系转换。<投影矩阵>*<视图矩阵>*<模型矩阵>*<顶点坐标> 相乘的顺序不能改变
+
+			}
+</script>
+<script type="x-shader/x-fragment" id="fragmentshader">
+           //gl_FragCoord:片元坐标，单位像素
+			uniform vec3 color;
+
+			void main() {
+
+				if ( length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475 ) discard;//不满足条件舍弃片元
+
+				gl_FragColor = vec4( color, 1.0 );
+
+			}
+
+</script>
+
+<script type="module">
+    import * as THREE from "../../js/three.module.js";
+    Vue.component(
+        'threes',
+        {
+            template:`<div>
+                  <div id="container"></div>
+            </div>`,
+            data(){
+                return{
+                    renderer:"",
+                    scene:"",
+                    camera:"",
+                    sphere:"",
+                    sprite:"",
+                    count:0
+                }
+            },
+            methods:{
+                onload() {
+                       let container=document.getElementById("container");//获取container
+                       this.scene=new THREE.Scene();//创建场景
+                       this.scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );//设置雾
+
+                       this.camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+                       this.camera.position.set(500,100,500);//创建相机并设置位置
+                       this.camera.lookAt(this.scene.position);
+                       let spriteGeometry=new THREE.BufferGeometry();
+                       let position=new Float32Array(50*50*3);//创建顶点存储空间
+                       let scales = new Float32Array( 50*50 );//创建存储尺寸的空间
+                       let i=0,j=0;
+                       for(let x=0;x<50;x++)
+                       {
+                        for(let y=0;y<50;y++)
+                          {
+                             position[i]=x*100-((50*100)/2);
+                             position[i+1]=0;//
+                             position[i+2]=y*100-((50*100)/2);
+                             scales[ j ] = 1;
+                             i+=3;
+                             j ++;
+                          }
+                       }
+                     spriteGeometry.setAttribute('position',new THREE.BufferAttribute(position,3));//把数据传入顶点着色器
+                     spriteGeometry.setAttribute('scale',new THREE.BufferAttribute(scales,1));//
+
+                     let spriteMaterial=new THREE.ShaderMaterial({//自定义着色器
+                              uniforms:{color: { value: new THREE.Color( 0x00CED1 ) },},
+                              vertexShader:document.getElementById("vertexshader").textContent,//顶点着色器属性vertexShader的属性值是顶点着色器代码字符串
+                              fragmentShader:document.getElementById("fragmentshader").textContent,//片元着色器属性fragmentShader的属性值是片元着色器代码字符串。
+                         });
+
+                    this.sprite=new THREE.Points(spriteGeometry,spriteMaterial);
+                    this.scene.add(this.sprite);
+
+                    this.renderer=new THREE.WebGLRenderer({antialias:true});
+                    this.renderer.setPixelRatio(window.devicePixelRatio);
+                    this.renderer.setSize(window.innerWidth,window.innerHeight);
+                    container.appendChild(this.renderer.domElement);
+                    window.addEventListener('resize',this.onResize,false);//浏览器大小改变监听
+          },
+
+                onResize() {
+                 this.camera.aspect=window.innerWidth/window.innerHeight;
+                 this.camera.updateProjectionMatrix();
+                 this.renderer.setSize(window.innerWidth,window.innerHeight);
+               },
+              run() {
+             requestAnimationFrame(this.run);
+                   let positions = this.sprite.geometry.attributes.position.array;
+                   let scales = this.sprite.geometry.attributes.scale.array;//BufferGeometry几何体对象具有.attributes属性，BufferGeometry.attributes具有顶点位置、顶点法向量、顶点uv坐标等属性，对应着色器中相应的attribute变量。
+
+                    let i = 0, j = 0;
+
+                   for ( let ix = 0; ix < 50; ix ++ ) {
+
+                     for ( let iy = 0; iy < 50; iy ++ ) {
+
+                          positions[ i + 1 ] = ( Math.sin( ( ix + this.count ) * 0.3 ) * 50 ) +
+                           ( Math.sin( ( iy + this.count ) * 0.5 ) * 50 );//y轴上面呈现波浪形
+
+                       scales[ j ] = ( Math.sin( ( ix + this.count ) * 0.3 ) + 1 ) * 8 +
+                         ( Math.sin( ( iy + this.count ) * 0.5 ) + 1 ) * 8;
+
+                   i += 3;
+                   j ++;
+
+            }
+
+        }
+
+        this.sprite.geometry.attributes.position.needsUpdate = true;//通知顶点位置更新
+        this.sprite.geometry.attributes.scale.needsUpdate = true;
+
+        this.renderer.render(this.scene,this.camera);
+        this.count += 0.1;
+               }
+            },
+            mounted(){
+                //console.log(12);
+                this.onload();
+                this.run();
+                //console.log(this.waterMesh);
+            },
+
+        });
+
+    Vue.component("input-style",{
+        props:['message','id','type','charlenght'],
+        template:`<div class="input_div">
+                       <input :type="type" class="common_input" ref="input" @blur="blurV($event)" @input="inputChange($event)" :id="id" :maxlength="charlenght">
+                       <label :for="id" class="input_label">
+                           <span class="input_label_content" v-show="show">{{message}}</span>
+                           <span class="tip_input" v-show="tip_show">{{tip}}</span>
+                       </label>
+                 </div>`,
+        data(){
+            return{
+                show:true,
+                tip:"提示",
+                tip_show:false
+            };
+        },
+        methods:{
+            inputChange:function (event) {
+                if(this.$refs.input.id=="input_account")
+                {
+                    this.verifi(event.currentTarget.value);
+                }else if(this.$refs.input.id=="input_password"){
+                    this.verifipass(event.currentTarget.value);
+                }
+            },
+            verifi:function (value) {
+                if(!(/^\d[0-9]*$/.test(value)))
+                {
+                    this.tip_show=true;
+                    this.tip="请输入数字";
+                }else {
+                    this.tip_show=false;
+                }
+            },
+            verifipass:function(value){
+                let patrn=/^\w+$/;
+                if (!patrn.test(value)) {
+                    this.tip_show=true;
+                    this.tip="请输入正确的密码格式";
+                }else {
+                    this.tip_show=false;
+                }
+            },
+            blurV:function (event) {
+                if(event.currentTarget.value=="")
+                {
+                    this.show=true;
+                    this.tip_show=false;
+                }else {
+                    this.show=false;
+                }
+            }
+        }
+    });
+
+    let vue=new Vue({
+        el:"#Vue",
+        data:{
+            register_text:"注册",
+        },
+        methods:{
+            backIndex:function () {//返回首页
+                window.location.href="./index.html";
+            }
+        }
+    })
+</script>
+</body>
+</html>

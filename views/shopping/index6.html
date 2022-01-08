@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <title>产品展示</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="css/index6.css">
+    <script src="../../js/vue.js"></script>
+    <script src="../../layui/layui.js"></script>
+    <script src="../../js/axios.min.js"></script>
+</head>
+<body>
+<div id="Vue">
+    <!--导航-->
+    <header>
+        <ul class="layui-nav layui-bg-green">
+            <li class="layui-nav-item "><a href="#">首页</a> </li>
+            <li class="layui-nav-item"><a href="#">产品</a> </li>
+            <li class="layui-nav-item">
+                <a href="#">二级菜单</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="#">案例</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </header>
+    <!--产品详情-->
+    <div class="layui-container">
+        <div class="layui-row">
+            <div class="layui-col-md4 layui-col-lg4 layui-col-xs4 layui-col-sm4" >
+                  <div class="img_production">
+                          <div class="img_header" id="mask_div" v-on:mouseenter="maskOver" v-on:mouseleave="maskOut">
+                              <div id="mask" class="mask" v-if="maskShow" v-bind:style="{transform: transformMask}"></div>
+                              <img v-bind:src="display_img"  v-on:mousemove="maskMove"  id="img_pos">
+                          </div>
+                          <div class="img_list">
+                                <ul v-for="(item,index) in img" v-bind:class="{'active':isTrue==index}" >
+                                    <li><img v-bind:src="item" v-on:click="changeImg($event,index)"></li>
+                                </ul>
+                          </div>
+                  </div>
+            </div>
+            <!--放大镜-->
+            <div class="img_big" v-if="show_big">
+                <img v-bind:src="display_img" v-bind:style="{transform: transBing}" >
+                <!--clientx:{{clientX}}<br>
+                clienty:{{clientY}}<br>
+                BoundingClientRect-left:{{BoundingClientRect.left}}<br>
+                BoundingClientRect-top:{{BoundingClientRect.top}}<br>
+                BoundingClientRect-bottom:{{BoundingClientRect.bottom}}<br>
+                BoundingClientRect-right:{{BoundingClientRect.right}}<br>
+                BoundingClientRect-height:{{BoundingClientRect.height}}<br>
+                BoundingClientRect-width:{{BoundingClientRect.width}}<br>
+                maskx:{{maskX}}<br>
+                masky:{{maskY}}<br>
+                y:{{y}}-->
+            </div>
+            <div class="layui-col-md-offset1 layui-col-md7 layui-col-lg7 layui-col-xs7 layui-col-sm7">
+
+                <div class="production_detail">
+                        <div class="production_title">
+                            <h1>{{list.title}}</h1>
+                        </div>
+                       <div class="production_origin">
+                           <h4>{{list.supplier}}</h4>
+                       </div>
+                    <div class="production_price">
+                       ￥ {{list.price}}
+                    </div>
+                    <div id="rate" class="production_rate">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let vue=new Vue({
+        el:"#Vue",
+        data:{
+            list:[],
+            img:[],
+            display_img:null,
+            isTrue:0,
+            maskShow:false,
+            BoundingClientRect:"",
+            clientX:"",
+            clientY:"",
+            maskX:"",
+            maskY:"",
+            x:"",
+            y:"",
+            transformMask:"",
+            transBing:"",
+            show_big:false
+        },
+        methods:{
+            changeImg:function (event,index) {
+                this.display_img=event.target.src;
+                this.isTrue=index;
+            },
+            maskOver:function () {
+                this.maskShow=true;
+                this.show_big=true;
+            },
+            maskOut:function(){
+                this.maskShow=false;
+                this.show_big=false;
+            },
+            maskMove:function (e) {
+                this.clientX=e.clientX;
+                this.clientY=e.clientY;
+                this.BoundingClientRect=document.getElementById("img_pos").getBoundingClientRect();
+                this.maskX=this.clientX-this.BoundingClientRect.left-this.BoundingClientRect.width/2;
+                this.maskY=this.clientY-this.BoundingClientRect.top-this.BoundingClientRect.height/2;
+                let x="";
+                let y="";
+                if(this.maskX>=-(this.BoundingClientRect.width/2)&&this.maskX<=(this.BoundingClientRect.width/2.5)&&this.maskY>=-(this.BoundingClientRect.height/3)&&this.maskY<=(this.BoundingClientRect.height/3))
+                {
+                    x=this.maskX+this.BoundingClientRect.width/4+80;
+                    y=this.maskY+this.BoundingClientRect.height/4+80;
+                    this.transformMask = `translate(${x}px,${y}px)`;
+                    let xbig=x-60;
+                    let ybig=y-60;
+                    this.transBing=`scale(2,2) translate(-${xbig}px,-${ybig}px)`;
+                }
+
+            }
+        },
+        created:function(){
+            let query = window.location.search.substring(1);
+            let Id=query.split("=");
+            axios.get(`http://vebcoder.cn:9527/api/detail?goodId=${Id[1]}`).then((res)=>{
+                this.list=res.data[0];
+                this.img=JSON.parse(res.data[0].imgs);
+                this.display_img=res.data[0].img_url;
+                console.log(res.data[0]);
+            })
+        },
+        mounted:function () {
+
+            layui.use('rate', function(){
+                let rate = layui.rate;
+
+                //渲染
+                let ins1 = rate.render({
+                    elem: '#rate',  //绑定元素
+                    length:5,
+                    half:true,
+                    value:3.5,
+                    text:true
+                });
+            });
+        }
+    })
+</script>
+</body>
+</html>

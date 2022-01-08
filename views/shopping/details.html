@@ -1,0 +1,176 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+<title>电影详情</title>
+    <script src="js/jquery-3.3.1.js"></script>
+    <script src="js/TweenMax.min.js"></script>
+    <script src="./js/vue.js"></script>
+    <link rel="stylesheet" href="css/swiper.css">
+    <script src="js/swiper.js"></script>
+
+<style>
+       *{
+        padding: 0;
+        margin: 0;
+       }
+        .actorinfo{
+        	margin-left: 8px;
+        	margin-top: 14px;
+        	width: 100%;
+        	white-space: nowrap;
+            border: 1px solid red;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+        	}
+        .actorbig{
+        	display: block;
+            flex: 1 1 auto;
+            margin: 1vw;
+            width: 30px;
+            border: 1px solid rebeccapurple;
+        	}
+        .actorpic {
+        	width: 100%;
+        	height:100%;
+            /*border: 1px solid #ff6600;*/
+            text-align: center;
+        	}
+        .actorpic img{
+        	border-radius: 50%;
+        	width: 100px;
+        	height: 100px;
+        	}
+        .actorname{
+              text-align: center;
+        	}
+       .active-nav{
+           background: #4476A7;
+       }
+      .swiper-slide{
+          text-align: center;
+      }
+</style>
+</head>
+<body >
+    <div id="app">
+        <div class="swiper-container" id="swiper-container1" style="border: 1px solid red;height: 20px">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide active-nav">
+                    版块1
+                </div>
+                <div class="swiper-slide">
+                    版块2
+                </div>
+                <div class="swiper-slide">
+                    版块3
+                </div>
+                <div class="swiper-slide">
+                    版块4
+                </div>
+                <div class="swiper-slide">
+                    版块5
+                </div>
+                <div class="swiper-slide">
+                    版块6
+                </div>
+                <div class="swiper-slide">
+                    版块7
+                </div>
+            </div>
+        </div>
+        <div class="swiper-container" id="swiper-container2">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" v-for="item  in imgs" >
+                    <div class="actorinfo" id="mi" >
+                        <div class="actorbig">
+                            <div class="actorpic"><img v-bind:src="item.img1"></div>
+                            <div class="actorname" >1</div>
+                        </div>
+                        <div class="actorbig">
+                            <div class="actorpic"><img v-bind:src="item.img2"></div>
+                            <div class="actorname" >2</div>
+                        </div>
+                        <div class="actorbig">
+                            <div class="actorpic"><img v-bind:src="item.img3"></div>
+                            <div class="actorname" >3</div>
+                        </div>
+                        <div class="actorbig">
+                            <div class="actorpic"><img v-bind:src="item.img4"></div>
+                            <div class="actorname" >4</div>
+                        </div>
+                        <div class="actorbig">
+                            <div class="actorpic"><img v-bind:src="item.img5"></div>
+                            <div class="actorname" >5</div>
+                        </div>
+                        <div class="actorbig">
+                            <div class="actorpic"><img v-bind:src="item.img6"></div>
+                            <div class="actorname" >6</div>
+                        </div>
+                        <div class="actorbig">
+                            <div class="actorpic"><img v-bind:src="item.img7"></div>
+                            <div class="actorname" >7</div>
+                        </div>
+                        <div style="clear: both"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    let app=new Vue({
+        el:"#app",
+        data:{
+            imgs:[
+                {img1:"pic1/wujin.jpg",img2:"pic1/lujingshan.jpg",img3:"pic1/lujingshan.jpg",img4:"pic1/lujingshan.jpg",img5:"pic1/lujingshan.jpg",img6:"pic1/lujingshan.jpg",img7:"pic1/lujingshan.jpg"},
+                {img1:"pic1/wujin.jpg",img2:"pic1/lujingshan.jpg",img3:"pic1/lujingshan.jpg",img4:"pic1/lujingshan.jpg",img5:"pic1/lujingshan.jpg",img6:"pic1/lujingshan.jpg",img7:"pic1/lujingshan.jpg"},
+                {img1:"pic1/wujin.jpg",img2:"pic1/lujingshan.jpg",img3:"pic1/lujingshan.jpg",img4:"pic1/lujingshan.jpg",img5:"pic1/lujingshan.jpg",img6:"pic1/lujingshan.jpg",img7:"pic1/lujingshan.jpg"}
+        ]
+        },
+        mounted:function () {
+            var mySwiper1 = new Swiper('#swiper-container1', {
+                watchSlidesProgress: true,
+                watchSlidesVisibility: true,
+                slideToClickedSlide:false,//点击跟随滑动
+                slidesPerView: 2,//一屏显示的个数
+                on:{
+                    tap: function () {
+                        mySwiper2.slideTo(mySwiper1.clickedIndex)
+                    }
+                }
+            });
+            var mySwiper2 = new Swiper('#swiper-container2', {
+                virtualTranslate : true,
+                on: {
+                    slideChangeTransitionStart: function () {
+                        updateNavPosition()
+                    },
+                    setTranslate: function(){
+                        this.$wrapperEl.transition('');
+                        TweenMax.to(this.$wrapperEl, 1.5, {x:this.translate, ease:Power4.easeOut})
+                    }
+                },
+
+            });
+
+            function updateNavPosition() {
+                $('#swiper-container1 .active-nav').removeClass('active-nav');
+                var activeNav = $('#swiper-container1 .swiper-slide').eq(mySwiper2.activeIndex).addClass('active-nav');
+                console.log(activeNav.index());
+                if (!activeNav.hasClass('swiper-slide-visible')) {
+                    if (activeNav.index() > mySwiper1.activeIndex) {
+                        var thumbsPerNav = Math.floor(mySwiper1.width / activeNav.width()) - 1;
+                        mySwiper1.slideTo(activeNav.index() - thumbsPerNav)
+                    } else {
+                        mySwiper1.slideTo(activeNav.index())
+                    }
+                }
+
+            }
+        }
+
+    });
+</script>
+</body>
+</html>

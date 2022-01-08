@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--地月系</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        #container{
+            width: 100%;
+            height: 700px;
+            background-color: #000000;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+
+    let renderer,scene,camera,cube,cloudMesh,moonMesh,EarthGroup,MoonGroup;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+
+        camera=new THREE.PerspectiveCamera(45,container.offsetWidth/container.offsetHeight,1,4000);
+        camera.position.set(6,6,6);//创建相机并设置位置
+
+        //let axe=new THREE.AxesHelper(20);
+        //scene.add(axe);//辅助工具，用于创建相机时，相机找到合适的位置
+
+        EarthGroup=new THREE.Group();//创建群组，用来存放地球和大气层
+
+
+        let pointLight=new THREE.PointLight();//创建点光源
+        pointLight.position.set(4,2,4);//设置光源的位置
+        pointLight.intensity=1.5;//设置光强
+        scene.add(pointLight);
+
+
+        let geometry=new THREE.SphereGeometry(1,32,32);//创建一个球
+        let textureLoader=new THREE.TextureLoader();
+        let surfaceMap=textureLoader.load("./img/earth_surface_2048.jpg");//创建颜色贴图
+        let normalMap=textureLoader.load("./img/earth_normal_2048.jpg");//创建法线贴图
+        let specularMap=textureLoader.load("./img/earth_specular_2048.jpg");//创建高光贴图
+        let material=new THREE.MeshPhongMaterial({map:surfaceMap,normalMap:normalMap,specularMap:specularMap});
+        geometry.computeTangents();//为着色器计算切线
+        cube=new THREE.Mesh(geometry,material);//将几何体和材料放到网格中
+        //cube.rotation.x=Math.PI/5;
+        EarthGroup.add(cube);
+
+        let cloudGeometry=new THREE.SphereGeometry(1.005,32,32);//创建大气层所在的球面
+        let cloudMap=textureLoader.load("./img/earth_clouds_1024.png");
+        let cloudMaterial=new THREE.MeshLambertMaterial({color:0xffffff,map:cloudMap,transparent:true});
+        cloudMesh=new THREE.Mesh(cloudGeometry,cloudMaterial);
+        EarthGroup.add(cloudMesh);
+        scene.add(EarthGroup);//把群组添加到场景中
+
+        let EarthMoonRingGeometry=new THREE.RingGeometry(7.45,7.458,100,100);
+        let EarthMoonRingMaterial=new THREE.MeshPhongMaterial({emissive:0xFFFFFF,side:THREE.DoubleSide});
+        let EarthMoonRingMesh=new THREE.Mesh(EarthMoonRingGeometry,EarthMoonRingMaterial);
+        EarthMoonRingMesh.rotation.x=Math.PI/2;
+        scene.add(EarthMoonRingMesh);
+        let moonGeometry=new THREE.SphereGeometry((1/3.7*1.2),32,32);//创建月球
+        let moonTexture=textureLoader.load("./img/moon_1024.jpg");//创建月亮贴图
+        let moonMaterial=new THREE.MeshPhongMaterial({map:moonTexture,ambient:0x888888});
+         moonMesh=new THREE.Mesh(moonGeometry,moonMaterial);
+        let distance=356400/6371;//转换成为地球尺度的单位（把地球当作单位球体）
+        moonMesh.position.set(Math.sqrt(distance/2),0,-Math.sqrt(distance/2));//(7.5,0,-7.5)
+        moonMesh.rotation.y=Math.PI;
+        MoonGroup=new THREE.Group();//创建月球群组，用于存放地球
+        MoonGroup.add(moonMesh);
+        moonMesh.rotation.x=0.089;//向黄道面倾斜
+        scene.add(MoonGroup);//把群组添加到场景中
+
+
+
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(container.offsetWidth,container.offsetHeight);
+        container.appendChild(renderer.domElement);
+
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+
+
+    }
+
+    function run() {
+
+        requestAnimationFrame(run);
+        cloudMesh.rotation.y+=0.0002;
+        cube.rotation.y+=0.0025;
+        moonMesh.rotation.y+=0.0025/28;//月球自转28为月球绕地球转的周期
+        MoonGroup.rotation.y+=0.00089;//月球公转
+        renderer.render(scene,camera);
+
+    }
+
+
+</script>
+</body>
+</html>

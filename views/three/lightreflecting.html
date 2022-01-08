@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>kinghiee--反光效果</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 6vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+    //import { GUI } from './js/dat.gui.module.js';
+    import Stats from './js/stats.module.js';
+    let renderer,scene,camera,spotLight,status,cubeCamera;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+        scene=new THREE.Scene();//创建场景
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+        camera.position.set( 30, 30, 100 );
+
+        let ambientLight=new THREE.AmbientLight();//添加环境光
+        scene.add(ambientLight);
+        let directionalLight=new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(0,10,10);
+        scene.add(directionalLight);
+        let skyCube=new THREE.CubeTextureLoader().setPath("./img/").load([  'px.jpg', 'nx.jpg',
+            'py.jpg', 'ny.jpg',
+            'pz.jpg', 'nz.jpg']);
+        scene.background=skyCube;
+        let materialLoader=new THREE.TextureLoader().load("./img/disturb.jpg");
+        let cubeGeometry=new THREE.BoxBufferGeometry(2,2,2,20);
+        let material=new THREE.MeshPhongMaterial({map:materialLoader});
+        let cubeMesh=new THREE.Mesh(cubeGeometry,material);
+        cubeMesh.position.set(-10,0,0);
+        scene.add(cubeMesh);
+
+        cubeCamera=new THREE.CubeCamera(0.1, 1000, 256);
+        scene.add(cubeCamera);
+        let geometry = new THREE.SphereBufferGeometry( 2, 100, 50 );
+        let geoMaterial=new THREE.MeshBasicMaterial({envMap:cubeCamera.renderTarget.texture});
+        let geoMesh=new THREE.Mesh(geometry,geoMaterial);
+        scene.add(geoMesh);
+        let torusMesh=new THREE.Mesh(new THREE.TorusGeometry(2, 1, 16, 100), material);
+         torusMesh.position.set(10,0,0);
+         scene.add(torusMesh);
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        //renderer.setClearColor(0xEEEEEE);
+        //renderer.autoClear = false;
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        status=new Stats();//创建频率显示
+        container.appendChild(status.dom);//频率挂到左上角
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        cubeCamera.update(renderer,scene);
+        renderer.render(scene,camera);
+        status.update();
+    }
+
+</script>
+</body>
+</html>

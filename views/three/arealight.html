@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--区域光</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+        footer{
+               height: 50px;
+               font-size: 1vw;
+               font-weight: lighter;
+               text-align: center;
+               color:white;
+               position: absolute;
+               z-index:1;
+               left: 0;
+               right: 0;
+               bottom: 5vh;
+           }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+
+    let renderer,scene,camera;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+        //scene.fog=new THREE.Fog(0xffffff,0.015,50);
+        //scene.fog=new THREE.FogExp2(0xffffff,0.01);
+        //scene.overrideMaterial=new THREE.MeshBasicMaterial({color:0x32CD32});
+
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,4000);
+        camera.position.set(20,5,25);//创建相机并设置位置
+        camera.lookAt(scene.position);
+
+        //let axe=new THREE.AxesHelper(20);
+        //scene.add(axe);//辅助工具，用于创建相机时，相机找到合适的位置
+
+        //let ambientLight=new THREE.AmbientLight();
+        //scene.add(ambientLight);
+        let rectLight1=new THREE.RectAreaLight(0xffffff,5,2,6);//创建区域光 颜色ffffff,强度：5，宽：2，高：6
+        rectLight1.position.set(4,3.1,0);//光的位置
+        rectLight1.rotation.x=-Math.PI;//绕轴旋转
+        scene.add(rectLight1);
+
+        var rectLightMesh1 = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial( {side:THREE.BackSide} ) );
+        rectLightMesh1.scale.x = rectLight1.width;
+        rectLightMesh1.scale.y = rectLight1.height;
+        rectLight1.add(rectLightMesh1);//平面缓冲几何体替代平面光光源位置
+
+        let rectLight2=new THREE.RectAreaLight(0xffffff,5,2,6);
+        rectLight2.position.set(12,3.1,0);
+        rectLight2.rotation.x=-Math.PI;
+        scene.add(rectLight2);
+
+        var rectLightMesh2 = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial( {side:THREE.BackSide} ) );
+        rectLightMesh2.scale.x = rectLight2.width;
+        rectLightMesh2.scale.y = rectLight2.height;
+        rectLight2.add(rectLightMesh2);
+
+        let rectLight3=new THREE.RectAreaLight(0xffffff,5,2,6);
+        rectLight3.position.set(18,3.1,0);
+        rectLight3.rotation.x=-Math.PI;
+        scene.add(rectLight3);
+
+        var rectLightMesh3 = new THREE.Mesh( new THREE.PlaneBufferGeometry(), new THREE.MeshBasicMaterial( {side:THREE.BackSide} ) );
+        rectLightMesh3.scale.x = rectLight3.width;
+        rectLightMesh3.scale.y = rectLight3.height;
+        rectLight3.add(rectLightMesh3);
+
+
+
+        let planeGeometry=new THREE.PlaneGeometry(60,20,1,1);
+        let planeMaterial=new THREE.MeshStandardMaterial( { color: 0x808080, roughness: 0, metalness: 0 } );
+        let plane=new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.rotation.x=-Math.PI/2;
+        plane.receiveShadow=true;
+        scene.add(plane);
+
+
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled=true;//开启阴影
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        //renderer.setClearColor(0XEEEEEE);
+        renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        renderer.render(scene,camera);
+    }
+
+
+</script>
+</body>
+</html>

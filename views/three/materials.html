@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--材质</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+
+    let renderer,scene,camera;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+        //scene.fog=new THREE.Fog(0xffffff,0.015,50);
+        //scene.fog=new THREE.FogExp2(0xffffff,0.01);
+        //scene.overrideMaterial=new THREE.MeshBasicMaterial({color:0x32CD32});
+
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,4000);
+        camera.position.set(20,5,25);//创建相机并设置位置
+        camera.lookAt(scene.position);
+
+        let axe=new THREE.AxesHelper(20);
+        scene.add(axe);//辅助工具，用于创建相机时，相机找到合适的位置
+
+        //let ambientLight=new THREE.AmbientLight();
+        //scene.add(ambientLight);
+
+        let spotLight=new THREE.SpotLight(0xffffff);
+        spotLight.position.set(0, 5,20);
+        spotLight.intensity=2;
+        scene.add(spotLight);
+        let spotLightMesh=new THREE.Mesh(new THREE.SphereGeometry(0.125,20,20),new THREE.MeshBasicMaterial());
+        spotLight.add(spotLightMesh);
+
+        let gridHelper=new THREE.GridHelper(30,20);
+        scene.add(gridHelper);
+
+        let sphereGeometry1=new THREE.SphereBufferGeometry(2,50,50);
+        let sphereGeometryMaterial1=new THREE.MeshBasicMaterial({color: 0xffaa00});
+        let sphereMesh1=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial1);
+        sphereMesh1.position.set(0,2,0);
+        scene.add(sphereMesh1);
+
+        let sphereGeometryMaterial2=new THREE.MeshBasicMaterial({color: 0xffaa00,transparent:true,blending:THREE.AdditiveBlending});//混合加法
+        let sphereMesh2=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial2);
+        sphereMesh2.position.set(6,2,0);
+        scene.add(sphereMesh2);//1
+
+        let sphereGeometryMaterial3Texture=new THREE.Texture(generateTexture());
+        sphereGeometryMaterial3Texture.needsUpdate=true;
+        let sphereGeometryMaterial3=new THREE.MeshBasicMaterial({map:sphereGeometryMaterial3Texture,transparent: true});
+        let sphereMesh3=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial3);
+        sphereMesh3.position.set(12,2,0);
+        scene.add(sphereMesh3);
+
+        let sphereGeometryMaterial4=new THREE.MeshDepthMaterial();
+        let sphereMesh4=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial4);
+        sphereMesh4.position.set(0,2,6);
+        scene.add(sphereMesh4);//2
+
+        let sphereGeometryMaterial5=new THREE.MeshNormalMaterial();
+        let sphereMesh5=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial5);
+        sphereMesh5.position.set(6,2,6);
+        scene.add(sphereMesh5);
+
+        let sphereGeometryMaterial6=new THREE.MeshNormalMaterial({shading:THREE.FlatShading});
+        let sphereMesh6=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial6);
+        sphereMesh6.position.set(12,2,6);
+        scene.add(sphereMesh6);//3
+
+        let sphereGeometryMaterial7=new THREE.MeshLambertMaterial({ color: 0xdddddd });
+        let sphereMesh7=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial7);
+        sphereMesh7.position.set(0,2,12);
+        scene.add(sphereMesh7);//4
+
+        let sphereGeometryMaterial8=new THREE.MeshLambertMaterial({ map:sphereGeometryMaterial3Texture,transparent:true});
+        let sphereMesh8=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial8);
+        sphereMesh8.position.set(6,2,12);
+        scene.add(sphereMesh8);//4
+
+        let sphereGeometryMaterial9=new THREE.MeshLambertMaterial({  color:0x666666,emissive: 0xff0000});
+        let sphereMesh9=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial9);
+        sphereMesh9.position.set(12,2,12);
+        scene.add(sphereMesh9);//4
+
+         let sphereGeometryMaterial10=new THREE.MeshPhongMaterial({color: 0xdddddd, specular: 0x009900, shininess: 40});
+        let sphereMesh10=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial10);
+        sphereMesh10.position.set(-6,2,12);
+        scene.add(sphereMesh10);//5
+
+         let sphereGeometryMaterial11=new THREE.MeshPhongMaterial({color: 0xdddddd, specular: 0x009900, shininess: 40,metal:true});
+        let sphereMesh11=new THREE.Mesh(sphereGeometry1,sphereGeometryMaterial11);
+        sphereMesh11.position.set(-12,2,12);
+        scene.add(sphereMesh11);//5
+
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled=true;//开启阴影
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        //renderer.setClearColor(0XEEEEEE);
+        renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        renderer.render(scene,camera);
+    }
+    function generateTexture() {
+
+        var canvas = document.createElement( 'canvas' );
+        canvas.width = 256;
+        canvas.height = 256;
+
+        var context = canvas.getContext( '2d' );
+        var image = context.getImageData( 0, 0, 256, 256 );
+
+        var x = 0, y = 0;
+
+        for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
+
+            x = j % 256;
+            y = x == 0 ? y + 1 : y;
+
+            image.data[ i ] = 255;
+            image.data[ i + 1 ] = 255;
+            image.data[ i + 2 ] = 255;
+            image.data[ i + 3 ] = Math.floor( x ^ y );
+
+        }
+
+        context.putImageData( image, 0, 0 );
+
+        return canvas;
+
+    }
+
+</script>
+</body>
+</html>

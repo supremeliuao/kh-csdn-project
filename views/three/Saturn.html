@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--土星</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        #container{
+            width: 100%;
+            height: 700px;
+            background-color: #000000;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+
+    let renderer,scene,camera,cube,cloudMesh,moonMesh,EarthGroup,MoonGroup;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+
+        camera=new THREE.PerspectiveCamera(45,container.offsetWidth/container.offsetHeight,1,4000);
+        camera.position.set(2,2,4.5);//创建相机并设置位置
+
+        let axe=new THREE.AxesHelper(20);
+        scene.add(axe);//辅助工具，用于创建相机时，相机找到合适的位置
+
+
+       /* let pointLight=new THREE.PointLight();//创建点光源
+        pointLight.position.set(4,2,4);//设置光源的位置
+        pointLight.intensity=1.5;//设置光强
+        scene.add(pointLight);*/
+       let ambientLight=new THREE.AmbientLight();
+        ambientLight.position.set(4,2,4);
+        scene.add(ambientLight);
+
+
+        let saturnGeometry=new THREE.SphereGeometry(1,100,100);
+        let texture=new THREE.TextureLoader();
+        let RingTexture=texture.load("./img/ring.png");
+        let saturnTexture=texture.load("./img/saturn_bjoernjonsson.jpg");
+        let RingGeometry=new THREE.RingGeometry(1.35,1.655,100,10);
+        let RingMesh=new THREE.Mesh(RingGeometry,new THREE.MeshPhongMaterial({map:RingTexture,side:THREE.DoubleSide}));
+        RingMesh.rotation.x=Math.PI/2;
+        scene.add(RingMesh);
+
+        let saturnMaterial=new THREE.MeshPhongMaterial({map:saturnTexture});
+        let saturnMesh=new THREE.Mesh(saturnGeometry,saturnMaterial);
+        scene.add(saturnMesh);
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        //renderer.setClearColor(0xEEEEEE);
+        renderer.setSize(container.offsetWidth,container.offsetHeight);
+        container.appendChild(renderer.domElement);
+
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+
+
+    }
+
+    function run() {
+
+        requestAnimationFrame(run);
+
+        renderer.render(scene,camera);
+
+    }
+
+
+</script>
+</body>
+</html>

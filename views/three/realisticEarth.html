@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--逼真地图</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        #container{
+            width: 100%;
+            height: 650px;
+            background-color: #000000;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+
+    let renderer,scene,camera,cube,cloudMesh;
+
+    action();
+    function action() {
+       onload();
+       run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+
+        camera=new THREE.PerspectiveCamera(45,container.offsetWidth/container.offsetHeight,1,4000);
+        camera.position.set(0,0,3.5);//创建相机并设置位置
+
+        //let axe=new THREE.AxesHelper(20);
+        //scene.add(axe);//辅助工具，用于创建相机时，相机找到合适的位置
+
+        let group=new THREE.Group();//创建群组，用来存放地球和大气层
+
+
+        let pointLight=new THREE.PointLight();//创建点光源
+        pointLight.position.set(-10,4,15);//设置光源的位置
+        pointLight.intensity=1.5;//设置光强
+        scene.add(pointLight);
+
+
+        let geometry=new THREE.SphereGeometry(1,32,32);//创建一个球
+        let textureLoader=new THREE.TextureLoader();
+        let surfaceMap=textureLoader.load("./img/earth_surface_2048.jpg");//创建颜色贴图
+        let normalMap=textureLoader.load("./img/earth_normal_2048.jpg");//创建法线贴图
+        let specularMap=textureLoader.load("./img/earth_specular_2048.jpg");//创建高光贴图
+        let material=new THREE.MeshPhongMaterial({map:surfaceMap,normalMap:normalMap,specularMap:specularMap});
+        cube=new THREE.Mesh(geometry,material);//将几何体和材料放到网格中
+        cube.rotation.x=Math.PI/5;
+        group.add(cube);
+
+        let cloudGeometry=new THREE.SphereGeometry(1.005,32,32);//创建大气层所在的球面
+        let cloudMap=textureLoader.load("./img/earth_clouds_1024.png");
+        let cloudMaterial=new THREE.MeshLambertMaterial({color:0xffffff,map:cloudMap,transparent:true});
+         cloudMesh=new THREE.Mesh(cloudGeometry,cloudMaterial);
+        group.add(cloudMesh);
+        scene.add(group);//把群组添加到场景中
+
+
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(container.offsetWidth,container.offsetHeight);
+        container.appendChild(renderer.domElement);
+
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+
+
+    }
+
+    function run() {
+
+        requestAnimationFrame(run);
+        cloudMesh.rotation.y+=0.0002;
+        cube.rotation.y+=0.0005;
+        renderer.render(scene,camera);
+
+    }
+
+
+</script>
+</body>
+</html>

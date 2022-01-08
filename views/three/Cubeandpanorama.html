@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--全景和立方体贴图</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+    import { GUI } from './js/dat.gui.module.js';
+    import Stats from './js/stats.module.js';
+    let renderer,scene,camera,spotLight,status,cameraCube,sceneCube,cubeMesh,SphereMaterial;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+        camera.position.set(0, 0, 1000);//创建相机并设置位置
+
+
+        sceneCube = new THREE.Scene();
+        cameraCube=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+
+
+
+        let ambientLight=new THREE.AmbientLight();//添加环境光
+        scene.add(ambientLight);
+
+        spotLight=new THREE.SpotLight(0xffffff);//添加点光源
+        spotLight.position.set(-600, 300,300);
+        spotLight.intensity=3;
+        scene.add(spotLight);
+        let spotLightMesh=new THREE.Mesh(new THREE.SphereGeometry(15,20,20),new THREE.MeshBasicMaterial());
+        spotLight.add(spotLightMesh);
+
+        let gridHelper=new THREE.GridHelper(30,20);
+        scene.add(gridHelper);
+
+        //立方体贴图
+        let textureCube=new THREE.CubeTextureLoader().setPath("img/").load(["posx.jpg", "negx.jpg","posy.jpg","negy.jpg","posz.jpg","negz.jpg"]);
+        textureCube.encoding=THREE.sRGBEncoding;//在导入材质时，会默认将贴图编码格式定义为Three.LinearEncoding，故需将带颜色信息的贴图(baseColorTexture, emissiveTexture, 和 specularGlossinessTexture)手动指定为Three.sRGBEncoding
+        textureCube.mapping=THREE.CubeReflectionMapping;//立方体反映射
+        textureCube.format=THREE.RGBFormat;//默认THREE.RGBAFormat,对于JPG会自动设置为THREE.RGBFormat
+        console.log(textureCube);
+
+        let SphereGeometry=new THREE.SphereBufferGeometry(300.0, 48, 24);
+            SphereMaterial=new THREE.MeshLambertMaterial({envMap:textureCube});
+        let SphereMesh=new THREE.Mesh(SphereGeometry,SphereMaterial);
+        scene.add(SphereMesh);
+
+        let cubeShader=THREE.ShaderLib["cube"];
+        console.log(THREE.ShaderLib);
+        let cubeMaterial=new THREE.ShaderMaterial({
+               fragmentShader:cubeShader.fragmentShader,
+               vertexShader:cubeShader.vertexShader,
+               uniforms:cubeShader.uniforms,
+               depthWrite:false,
+               side: THREE.BackSide
+        });
+        cubeMaterial.uniforms["tCube"].value=textureCube;
+        console.log(cubeMaterial);
+
+        //全景贴图
+        let panorama=new THREE.TextureLoader().load("./img/2294472375_24a3b8ef46_o.jpg");
+        panorama.mapping = THREE.EquirectangularReflectionMapping;
+        panorama.magFilter = THREE.LinearFilter;
+        panorama.minFilter = THREE.LinearMipmapLinearFilter;
+        panorama.encoding = THREE.sRGBEncoding;
+        let panoramaShader=THREE.ShaderLib["equirect"];
+        let panoramaMaterial=new THREE.ShaderMaterial({
+            fragmentShader:panoramaShader.fragmentShader,
+            vertexShader: panoramaShader.vertexShader,
+            uniforms:panoramaShader.uniforms,
+            depthWrite: false,
+            side: THREE.BackSide
+        });
+        panoramaMaterial.uniforms["tEquirect"].value=panorama;
+
+
+        cubeMesh=new THREE.Mesh(new THREE.BoxBufferGeometry( 10, 100, 100 ),cubeMaterial);
+        sceneCube.add(cubeMesh);
+
+
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.autoClear=false;
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        let guiControls=new function(){
+            this.Cube=function () {
+                cubeMesh.material = cubeMaterial;
+                cubeMesh.visible = true;
+                SphereMaterial.envMap = textureCube;
+                SphereMaterial.needsUpdate = true;
+            };
+           this.Equirectangular=function () {
+                cubeMesh.material = panoramaMaterial;
+                cubeMesh.visible = true;
+                SphereMaterial.envMap=panorama;
+                SphereMaterial.needsUpdate = true;
+            }
+        };
+
+        let gui=new GUI();//创建gui
+        gui.add(guiControls,'Cube');
+        gui.add(guiControls,'Equirectangular');
+
+        status=new Stats();//创建频率显示
+        container.appendChild(status.dom);//频率挂到左上角
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        cameraCube.aspect = window.innerWidth / window.innerHeight;
+        cameraCube.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        camera.lookAt(scene.position);
+        cameraCube.rotation.copy(camera.rotation);//赋值相机的位置
+        renderer.render(sceneCube,cameraCube);
+        renderer.render(scene,camera);
+        status.update();
+
+    }
+
+
+</script>
+</body>
+</html>

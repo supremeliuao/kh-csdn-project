@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--融合</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+
+    let renderer,scene,camera;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+        //scene.fog=new THREE.Fog(0xffffff,0.015,50);
+        //scene.fog=new THREE.FogExp2(0xffffff,0.01);
+        //scene.overrideMaterial=new THREE.MeshBasicMaterial({color:0x32CD32});
+
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,4000);
+        camera.position.set(20,5,25);//创建相机并设置位置
+        camera.lookAt(scene.position);
+
+        let axe=new THREE.AxesHelper(20);
+        scene.add(axe);//辅助工具，用于创建相机时，相机找到合适的位置
+
+        //let ambientLight=new THREE.AmbientLight();
+        //scene.add(ambientLight);
+
+        let spotLight=new THREE.SpotLight(0xffffff);
+        spotLight.position.set(0, 5,20);
+        spotLight.intensity=2;
+        scene.add(spotLight);
+        let spotLightMesh=new THREE.Mesh(new THREE.SphereGeometry(0.125,20,20),new THREE.MeshBasicMaterial());
+        spotLight.add(spotLightMesh);
+
+        let gridHelper=new THREE.GridHelper(30,20);
+        scene.add(gridHelper);
+
+        let planeGeometry=new THREE.PlaneGeometry(2,2);
+        let TextureLoader=new THREE.TextureLoader();
+        let Texture=TextureLoader.load("./img/lensflare0.png");
+        let planeMaterial=new THREE.MeshBasicMaterial({map:Texture,blending:THREE.AdditiveBlending});
+        let planeMesh=new THREE.Mesh(planeGeometry,planeMaterial);
+        planeMesh.position.set(0,1,0);
+        scene.add(planeMesh);
+
+        let planeMaterial2=new THREE.MeshBasicMaterial({map:Texture,blending:THREE.NormalBlending});
+        let planeMesh2=new THREE.Mesh(planeGeometry,planeMaterial2);
+        planeMesh2.position.set(2,1,0);
+        scene.add(planeMesh2);
+
+        let planeMaterial3=new THREE.MeshBasicMaterial({map:Texture,blending:THREE.SubtractiveBlending});
+        let planeMesh3=new THREE.Mesh(planeGeometry,planeMaterial3);
+        planeMesh3.position.set(4,1,0);
+        scene.add(planeMesh3);
+
+        let planeMaterial4=new THREE.MeshBasicMaterial({map:Texture,blending:THREE.MultiplyBlending});
+        let planeMesh4=new THREE.Mesh(planeGeometry,planeMaterial4);
+        planeMesh4.position.set(6,1,0);
+        scene.add(planeMesh4);
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled=true;//开启阴影
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        //renderer.setClearColor(0XEEEEEE);
+        renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        renderer.render(scene,camera);
+    }
+
+
+</script>
+</body>
+</html>

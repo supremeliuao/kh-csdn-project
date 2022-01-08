@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>kinghiee--逼真海面</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 6vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+    //import { GUI } from './js/dat.gui.module.js';
+    import Stats from './js/stats.module.js';
+    import {Water} from './js/Water.js';
+    import {Sky} from "./js/Sky.js";
+    let renderer,scene,camera,status,sphere,waterMesh;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+        scene=new THREE.Scene();//创建场景
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+        camera.position.set( 30, 20, 100 );
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        //renderer.autoClear = false;
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        let directionalLight=new THREE.DirectionalLight(0xffffff, 0.8);
+         scene.add(directionalLight);
+
+        //创建水平面
+        let waterPlane=new THREE.PlaneBufferGeometry(10000,10000);
+        waterMesh=new Water(waterPlane,{
+            textureWidth:512,//画布宽度
+            textureHeight:512,//画布高度
+            waterNormals:new THREE.TextureLoader().load("./img/waternormals.jpg",function (texture) {
+                texture.wrapS=texture.wrapT=THREE.RepeatWrapping;//法向量贴图
+            }),
+            alpha:1.0,//透明度
+            sunDirection: directionalLight.position.clone().normalize(),
+            sunColor: 0xffffff,//太阳的颜色
+            waterColor:0x001e0f,//水的颜色
+            distortionScale: 3.7,//物体倒影的分散度
+            fog: scene.fog !== undefined,
+
+        });
+        waterMesh.rotation.x=-Math.PI/2;
+        scene.add(waterMesh);
+
+        //创建天空盒子
+
+        // Skybox
+        let sky = new Sky();
+        let uniforms = sky.material.uniforms;
+        uniforms[ 'turbidity' ].value = 10;//内置变量
+        uniforms[ 'rayleigh' ].value = 2;//视觉效果就是傍晚晚霞的红光的深度
+        uniforms[ 'luminance' ].value = 1;//视觉效果整体提亮或变暗0-1
+        uniforms[ 'mieCoefficient' ].value = 0.005;
+        uniforms[ 'mieDirectionalG' ].value = 0.8;
+
+        let parameters = {
+            distance: 400,
+            inclination: 0.49,//倾向
+            azimuth: 0.205//方位
+        };
+
+        let cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );//创建反光效果
+        cubeCamera.renderTarget.texture.generateMipmaps = true;
+        cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
+        scene.background = cubeCamera.renderTarget;
+
+        function updateSun() {
+            var theta = Math.PI * ( parameters.inclination - 0.5 );//-0.01*Math.PI -0.0314
+            var phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );//-0.59*Math.PI=-1.8535
+            directionalLight.position.x = parameters.distance * Math.cos( phi );//399.79
+            //directionalLight.position.x =399.79;
+            directionalLight.position.y = parameters.distance * Math.sin( phi ) * Math.sin( theta );//-0.14
+            //directionalLight.position.y = -0.14;//太阳高度
+            directionalLight.position.z = parameters.distance * Math.sin( phi ) * Math.cos( theta );//-0.323
+            //directionalLight.position.z =-129.18708;
+            sky.material.uniforms[ 'sunPosition' ].value =directionalLight.position.copy( directionalLight.position );//设置太阳的位置
+            waterMesh.material.uniforms[ 'sunDirection' ].value.copy( directionalLight.position ).normalize();//设置太阳的光照方向，并进行归一化(化为单位值)
+            //waterMesh.material.uniforms[ 'sunDirection' ].value=directionalLight.position.normalize();
+           cubeCamera.update(renderer,sky);
+        }
+
+        updateSun();
+
+
+
+        //创建多边形物体
+        let geometry = new THREE.IcosahedronBufferGeometry( 20, 1 );
+        let count = geometry.attributes.position.count;
+        let colors = [];
+        let color = new THREE.Color();
+        for ( let i = 0; i < count; i +=3 ) {//设置颜色
+            color.setHex( Math.random() * 0xffffff );//255
+            colors.push( color.r, color.g, color.b );
+            colors.push( color.r, color.g, color.b );
+            colors.push( color.r, color.g, color.b );
+        }
+        console.log(colors);
+        geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );//向顶点传入顶点颜色
+        let  material = new THREE.MeshStandardMaterial( {
+            vertexColors: THREE.VertexColors,//使用顶点颜色进行着色
+            roughness: 0.0,
+            flatShading: true,
+            envMap: cubeCamera.renderTarget.texture,//设置环境贴图
+            side: THREE.DoubleSide
+        } );
+        sphere = new THREE.Mesh( geometry, material );
+        scene.add( sphere );
+
+        let sphereGeometry=new THREE.SphereBufferGeometry(8,100,100);
+        let sphereMaterial=new THREE.MeshBasicMaterial({envMap:cubeCamera.renderTarget.texture});
+        let sphereMesh=new THREE.Mesh(sphereGeometry,sphereMaterial);
+        sphereMesh.position.set(30,10,0);
+        scene.add(sphereMesh);
+
+
+        status=new Stats();//创建频率显示
+        container.appendChild(status.dom);//频率挂到左上角
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+        contorl.minDistance=40;//最大最小相机移动距离(景深相机)
+        contorl.maxDistance=200;
+        contorl.maxPolarAngle=Math.PI * 0.495; //最大仰视角和俯视角
+        contorl.minPolarAngle=0;
+        contorl.update();
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        var time = performance.now() * 0.001;
+        sphere.position.y = Math.sin( time ) * 20 + 5;//物体上下移动
+        sphere.rotation.x = time * 0.5;
+        sphere.rotation.z = time * 0.51;
+        waterMesh.material.uniforms['time'].value += 1.0 / 60.0;//创建水面微波
+        renderer.render(scene,camera);
+        status.update();
+    }
+
+</script>
+</body>
+</html>

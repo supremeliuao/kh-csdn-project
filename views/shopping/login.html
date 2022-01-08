@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>kinghiee--登陆</title>
+    <script src="../../js/vue.js"></script>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <script src="../../layui/layui.js"></script>
+</head>
+<style>
+    html,body{
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+    }
+    #Vue{
+        height: 100%;
+        position: relative;
+    }
+    #div_3D{
+        height: 90%;
+        width: 100%;
+        position: absolute;
+        z-index: 1;
+    }
+    #container{
+        height: 40vw;
+        width: 100%;
+    }
+    header{
+        position: absolute;
+        width: 100%;
+        z-index: 2;
+        opacity: 0.5;
+    }
+    .login{
+        position: fixed;
+        height: 450px;
+        width: 400px;
+        top: 0;
+        bottom:0;
+        right: 8vw;
+        margin:auto;
+        /*border: 1px solid darkblue;*/
+        z-index: 2;
+        background: rgba(57,61,73,0.5);
+        border-radius: 5px;
+        /*box-shadow: 0 1px 8px rgba(30,159,255,0.8);*/
+    }
+    .login_register_text{
+        color: rgba(220,220,220,0.5);
+        font-weight: lighter;
+        margin: 2.5vw 1vw;
+        position: relative;
+    }
+     .login_text{
+         font-size: 2em;
+     }
+     .register_text{
+         position: absolute;
+         bottom: 0;
+         right: 0;
+         font-size: 0.9em;
+         cursor: pointer;
+     }
+     .register_text:hover{
+         color: rgba(220,220,220,0.8);
+         transition: all ease-out 1s;
+     }
+    .input_div{
+      position: relative;
+      margin: 4vw  1vw;
+    }
+    .common_input{
+       background: transparent;
+       width: 100%;
+       padding: 0.4em 0.25em;
+       color: #AFB5BB;
+       font-size: 1.5em;
+       border:0;
+       outline: none;
+       font-family: "幼圆";
+       /*transition: transform 0.3s;*/
+    }
+
+    .common_input:focus + .input_label >.input_label_content{
+        display: none;
+        transition:all ease-out 2s;
+    }
+
+    .common_input:focus + .input_label:after{
+        transform: scaleX(1.06);
+        transition: all ease-out 0.5s;
+    }
+    .input_label{
+      position: absolute;
+      top:0;
+      width: 100%;
+      text-align: left;
+      pointer-events: none;/*元素不再是鼠标事件的目标，鼠标不再监听当前层而去监听下面的层中的元素。但是如果它的子元素设置了pointer-events为其它值，比如auto，鼠标还是会监听这个子元素的*/
+      transition: transform 0.3s;
+      height: 30px;
+      line-height: 30px;
+    }
+    .input_label:before{
+        top:0;
+    }
+    .input_label:after{
+        bottom: 0;
+        left: 0;
+    }
+    .input_label:after{
+        content: '';
+        position: absolute;
+        z-index: -1;
+        width: 95%;
+        height: 3px;
+        background:rgba(30,159,255,0.8);
+        transition: all ease-out 0.5s;
+    }
+
+    .input_label_content{
+        transition: all ease-out 0.3s;
+        color: rgba(220,220,220,0.8);
+        font-size: 1.2em;
+        font-family: "幼圆";
+        font-weight: lighter;
+    }
+    .tip_input{
+        float: right;
+        font-family: "幼圆";
+        color: rgba(219,112,147,0.8);
+    }
+    .btm_message{
+        margin: -2vw 1vw;
+    }
+    .forget_text{
+        color: rgba(220,220,220,0.5);
+        transition: all ease-out 1s;
+        font-size: .9em;
+    }
+    .forget_text:hover{
+        color: rgba(220,220,220,0.8);
+        transition: all ease-out 1s;
+        cursor: pointer;
+    }
+    .login_botton{
+        margin: 2.5vw 1vw;
+    }
+    .login_botton>button{
+        width: 100%;
+        padding: 0.8vw;
+        color:rgba(220,220,220,0.8);
+        background-color:rgba(30,159,255,0.5);
+        border-radius: 3px;
+        border-width: 0;
+        margin: 0;
+        outline: none;
+        font-size: 15px;
+        font-weight: lighter;
+        text-align: center;
+        cursor: pointer;
+    }
+    .Copyright{
+        position: absolute;
+        bottom:1vw;
+        text-align: center;
+        width: 100%;
+        font-family: "幼圆";
+        color: rgba(220,220,220,0.5);
+    }
+
+</style>
+
+<body>
+<div id="Vue">
+    <header>
+        <ul class="layui-nav layui-bg-black">
+            <li class="layui-nav-item layui-bg-blue"><a href="#" v-on:Click="backIndex">首页</a> </li>
+        </ul>
+    </header>
+    <!--3D背景-->
+    <div id="div_3D">
+        <three></three>
+    </div>
+
+    <!--登陆-->
+    <div class="login" id="login">
+         <div class="layui-fluid" >
+             <div class="layui-col-lg12">
+                 <div class="login_register_text">
+                     <div class="login_text">{{login_text}}</div>
+                     <div class="register_text" v-on:Click="createAccount">{{want_create_account}}</div>
+                 </div>
+                 <input-style  message="账号" id="input_account" type="text" charlenght="10"></input-style>
+                 <input-style message="密码" id="input_password" type="password" charlenght="8"></input-style>
+                 <div class="btm_message">
+                     <div class="forget_text">{{forget_text}}</div>
+                 </div>
+                 <div class="login_botton">
+                     <button @click="sub">{{login_text}}</button>
+                 </div>
+                 </div>
+             </div>
+            <div class="Copyright">
+                Copyright © 2020 Kinghiee. All rights reserved
+            </div>
+         </div>
+    </div>
+</div>
+<script type="module">
+    import * as THREE from "../../js/three.module.js";
+    import {OrbitControls} from "../../js/OrbitControls.js";
+    import {Water} from '../../js/Water.js';
+    import {Sky} from "../../js/Sky.js";
+    Vue.component(
+        'three',
+        {
+            template:`<div>
+                  <div id="container"></div>
+            </div>`,
+            data(){
+                return{
+                    renderer:"",
+                    scene:"",
+                    camera:"",
+                    sphere:"",
+                    waterMesh:"",
+                    container:""
+                }
+            },
+            methods: {
+                onload:function(){
+                    this.scene=new THREE.Scene();//创建场景
+                    this.camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+                    this.camera.position.set( 30, 20, 100 );
+
+                    this.renderer=new THREE.WebGLRenderer({antialias:true});
+                    this.renderer.setPixelRatio(window.devicePixelRatio);
+                    this.renderer.setSize(window.innerWidth,window.innerHeight);
+                    this.container.appendChild(this.renderer.domElement);
+
+                    let directionalLight=new THREE.DirectionalLight(0xffffff, 0.8);
+                    this.scene.add(directionalLight);
+
+                    //创建水平面
+                    let waterPlane=new THREE.PlaneBufferGeometry(10000,10000);
+                    this.waterMesh=new Water(waterPlane,{
+                        textureWidth:512,//画布宽度
+                        textureHeight:512,//画布高度
+                        waterNormals:new THREE.TextureLoader().load("./img/waternormals.jpg",function (texture) {
+                            texture.wrapS=texture.wrapT=THREE.RepeatWrapping;//法向量贴图
+                        }),
+                        alpha:1.0,//透明度
+                        sunDirection: directionalLight.position.clone().normalize(),
+                        sunColor: 0xffffff,//太阳的颜色
+                        waterColor:0x001e0f,//水的颜色
+                        distortionScale: 3.7,//物体倒影的分散度
+                        fog: this.scene.fog !== undefined,
+                    });
+                    this.waterMesh.rotation.x=-Math.PI/2;
+                    this.scene.add(this.waterMesh);
+
+                    //创建天空盒子
+
+                    // Skybox
+                    let sky = new Sky();
+                    let uniforms = sky.material.uniforms;
+                    uniforms[ 'turbidity' ].value = 10;//内置变量
+                    uniforms[ 'rayleigh' ].value = 2;//视觉效果就是傍晚晚霞的红光的深度
+                    uniforms[ 'luminance' ].value = 1;//视觉效果整体提亮或变暗0-1
+                    uniforms[ 'mieCoefficient' ].value = 0.005;
+                    uniforms[ 'mieDirectionalG' ].value = 0.8;
+
+                    let parameters = {
+                        distance: 400,
+                        inclination: 0.49,//倾向
+                        azimuth: 0.205//方位
+                    };
+
+                    let cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );//创建反光效果
+                    cubeCamera.renderTarget.texture.generateMipmaps = true;
+                    cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
+                    this.scene.background = cubeCamera.renderTarget;
+
+                    function updateSun(waterMesh,renderer) {
+                        let theta = Math.PI * ( parameters.inclination - 0.5 );//-0.01*Math.PI -0.0314
+                        let phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );//-0.59*Math.PI=-1.8535
+                        directionalLight.position.x = parameters.distance * Math.cos( phi );//399.79
+                        directionalLight.position.y = parameters.distance * Math.sin( phi ) * Math.sin( theta );//-0.14
+                        directionalLight.position.z = parameters.distance * Math.sin( phi ) * Math.cos( theta );//-0.323
+                        sky.material.uniforms[ 'sunPosition' ].value =directionalLight.position.copy( directionalLight.position );//设置太阳的位置
+                        waterMesh.material.uniforms[ 'sunDirection' ].value.copy( directionalLight.position ).normalize();//设置太阳的光照方向，并进行归一化(化为单位值)
+                        cubeCamera.update(renderer,sky);
+                    }
+                    updateSun(this.waterMesh,this.renderer);
+
+                    //创建多边形物体
+                    let geometry = new THREE.IcosahedronBufferGeometry( 20, 1 );
+                    let count = geometry.attributes.position.count;
+                    let colors = [];
+                    let color = new THREE.Color();
+                    for ( let i = 0; i < count; i +=3 ) {//设置颜色
+                        color.setHex( Math.random() * 0xffffff );//255
+                        colors.push( color.r, color.g, color.b );
+                        colors.push( color.r, color.g, color.b );
+                        colors.push( color.r, color.g, color.b );
+                    }
+                    geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );//向顶点传入顶点颜色
+                    let  material = new THREE.MeshStandardMaterial( {
+                        vertexColors: THREE.VertexColors,//使用顶点颜色进行着色
+                        roughness: 0.0,
+                        flatShading: true,
+                        envMap: cubeCamera.renderTarget.texture,//设置环境贴图
+                        side: THREE.DoubleSide
+                    } );
+                    this.sphere = new THREE.Mesh( geometry, material );
+                    this.sphere.position.set(-50,0,0);
+                    this.scene.add(this.sphere );
+
+                    let sphereGeometry=new THREE.SphereBufferGeometry(8,100,100);
+                    let sphereMaterial=new THREE.MeshBasicMaterial({envMap:cubeCamera.renderTarget.texture});
+                    let sphereMesh=new THREE.Mesh(sphereGeometry,sphereMaterial);
+                    sphereMesh.position.set(0,10,0);
+                    this.scene.add(sphereMesh);
+
+                    let contorl=new OrbitControls(this.camera,this.renderer.domElement);//添加鼠标滚动缩放，旋转对象
+                    contorl.minDistance=40;//最大最小相机移动距离(景深相机)
+                    contorl.maxDistance=200;
+                    contorl.maxPolarAngle=Math.PI * 0.495; //最大仰视角和俯视角
+                    contorl.minPolarAngle=0;
+                    contorl.update();
+                    window.addEventListener('resize',this.onResize,false);//浏览器大小改变监听
+                },
+                onResize:function() {
+                    this.camera.aspect=window.innerWidth/window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth,window.innerHeight);
+                },
+                run:function() {
+                    requestAnimationFrame(this.run);
+                    this.camera.lookAt(new THREE.Vector3(0,10,0));
+                    let time = performance.now() * 0.001;
+                    this.sphere.position.y = Math.sin( time ) * 20 + 5;//物体上下移动
+                    this.sphere.rotation.x = time * 0.5;
+                    this.sphere.rotation.z = time * 0.51;
+                    this.waterMesh.material.uniforms['time'].value += 1.0 / 60.0;//创建水面微波
+                    this.renderer.render(this.scene,this.camera);
+                }
+            },
+            mounted(){
+                //console.log(12);
+                this.container=document.getElementById("container");
+                this.onload();
+                this.run();
+                //console.log(this.waterMesh);
+            },
+        }
+    );
+
+    Vue.component("input-style",{
+        props:['message','id','type','charlenght','ivalue'],
+        template:`<div class="input_div">
+                       <input :type="type" class="common_input" ref="input" @blur="blurV($event)" @input="inputChange($event)" :id="id" :maxlength="charlenght">
+                       <label :for="id" class="input_label">
+                           <span class="input_label_content" v-show="show">{{message}}</span>
+                           <span class="tip_input" v-show="tip_show">{{tip}}</span>
+                       </label>
+                 </div>`,
+        data(){
+          return{
+              show:true,
+              tip:"提示",
+              tip_show:false
+          };
+        },
+        methods:{
+            inputChange:function (event) {
+                if(this.$refs.input.id=="input_account")
+                {
+                    this.verifi(event.currentTarget.value);
+                }else if(this.$refs.input.id=="input_password"){
+                     this.verifipass(event.currentTarget.value);
+                }
+            },
+            verifi:function (value) {
+               if(!(/^\d[0-9]*$/.test(value)))
+               {
+                   this.tip_show=true;
+                   this.tip="请输入数字";
+               }else {
+                   this.tip_show=false;
+               }
+            },
+            verifipass:function(value){
+                let patrn=/^\w+$/;
+                if (!patrn.test(value)) {
+                    this.tip_show=true;
+                    this.tip="请输入正确的密码格式";
+                }else {
+                    this.tip_show=false;
+                }
+        },
+         blurV:function (event) {
+                if(event.currentTarget.value=="")
+                {
+                    this.show=true;
+                    this.tip_show=false;
+                }else {
+                     this.show=false;
+                }
+            }
+        }
+    });
+    let vue=new Vue({
+        el:"#Vue",
+        data:{
+          login_text:"登陆",
+          forget_text:"忘记密码？",
+          want_create_account:"想要创建账号？",
+            input_value:"",
+        },
+       methods:{
+            backIndex:function () {//返回首页
+                window.location.href="./index.html";
+            },
+           createAccount:function () {
+               window.open("./create_account.html");
+           },
+           sub(){
+                alert(this.input_value)
+           }
+       }
+    });
+
+</script>
+</body>
+</html>

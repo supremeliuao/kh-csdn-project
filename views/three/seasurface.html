@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kinghiee--动态海面</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:black;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+    import Stats from './js/stats.module.js';
+    import { FirstPersonControls } from './js/FirstPersonControls.js';
+    let renderer,scene,camera,spotLight,status,firstPersonControl,clock,planeGeometry;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+        scene.background=new THREE.Color(0xaaccff);//场景背景设为淡蓝色
+        //scene.fog=new THREE.Fog(0xffffff,0.015,50);
+        scene.fog=new THREE.FogExp2(0xaaccff,0.0007);//设置雾
+        //scene.overrideMaterial=new THREE.MeshBasicMaterial({color:0x32CD32});
+
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+        camera.position.set(80,50,85);//创建相机并设置位置
+        camera.lookAt(scene.position);
+
+        clock=new THREE.Clock();//创建时钟对象，用于获取时间
+
+        firstPersonControl=new FirstPersonControls(camera);//初始化第一视角控制器
+        firstPersonControl.movementSpeed=200;//设置相机移动速度
+        firstPersonControl.lookSpeed=1;//设置鼠标移动查看的速度
+
+
+        //let axe=new THREE.AxesHelper(20);
+       // scene.add(axe);//辅助工具，用于创建相机时，相机找到合适的位置
+
+        //let ambientLight=new THREE.AmbientLight();
+        //scene.add(ambientLight);
+
+        /*spotLight=new THREE.SpotLight(0xffffff);
+        spotLight.position.set(0, 5,20);
+        spotLight.intensity=2;
+        scene.add(spotLight);
+        let spotLightMesh=new THREE.Mesh(new THREE.SphereGeometry(0.125,20,20),new THREE.MeshBasicMaterial());
+        spotLight.add(spotLightMesh);*/
+
+        //let gridHelper=new THREE.GridHelper(30,20);
+        //scene.add(gridHelper);
+
+           planeGeometry=new THREE.PlaneBufferGeometry(20000,20000,127,127);//创建平面
+           planeGeometry.rotateX(-Math.PI/2);//旋转至水平。注意这个平面选择应该放到这里，不能放到产生波浪纹下面，否则会画面错误
+        let position=planeGeometry.attributes.position;//获取点
+            position.dynamic=true;//设置planeGeometry为动态的，这样才允许改变其中的顶点
+        for ( let i = 0; i < position.count; i ++ ) {
+
+            let y = 35 * Math.sin( i / 2 );
+            position.setY( i, y );//设置波纹
+
+        }
+
+        let waterTexture=new THREE.TextureLoader().load("./img/water2.jpg");//创建纹理
+            waterTexture.wrapS=waterTexture.wrapT=THREE.RepeatWrapping;//重复纹理
+            waterTexture.repeat.set(5,5);//设置纹理在x，y轴多久重复一次
+        let planeMaterial=new THREE.MeshBasicMaterial({color: 0x0044ff,map:waterTexture});
+        let planeMesh=new THREE.Mesh(planeGeometry,planeMaterial);
+
+
+        scene.add(planeMesh);
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        //renderer.shadowMap.enabled=true;//开启阴影
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        //renderer.setClearColor(0XEEEEEE);
+        //renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        status=new Stats();//创建频率显示
+        container.appendChild(status.dom);//频率挂到左上角
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        firstPersonControl.handleResize();
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        let time = clock.getElapsedTime() * 10;//获取自时钟启动后的秒数
+        let position = planeGeometry.attributes.position;
+        for ( let i = 0; i < position.count; i ++ ) {
+            let y = 35 * Math.sin( i / 5 + ( time + i ) / 7 );
+            position.setY( i, y );
+        }
+        position.needsUpdate = true;//更新位置
+        let delta=clock.getDelta();//获取oldtime设置后到当前的时间(就是第一次执行getDelta到第二次执行getDelta之间时间)
+        firstPersonControl.update(delta);//更新控制器
+        renderer.render(scene,camera);
+        status.update();
+    }
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kinghiee--OBJ模型</title>
+	<meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+	   *{
+            margin: 0;
+			padding: 0;
+        }
+        html,body{
+              width: 100%;
+              height: 100%;
+            overflow: hidden;
+        }
+		 #container{
+		 border:1px solied red;
+            height: 100%;
+			width: 100%;
+        }
+	
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+    import { OBJLoader } from './js/OBJLoader.js';
+    import Stats from './js/stats.module.js';
+    let renderer,scene,camera,status,directionalLight;
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+        scene=new THREE.Scene();//创建场景
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,100000);
+        camera.position.set( 3500, 3800, 4000 );
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.autoClear = false;
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        let axes=new THREE.AxesHelper(20);
+        scene.add(axes);
+        directionalLight=new THREE.DirectionalLight(0x87CEFA, 0.8);
+        directionalLight.position.set(-100,100,0);
+        scene.add(directionalLight);
+        //let ambientLight=new THREE.AmbientLight();//添加环境光
+        //scene.add(ambientLight);
+        let skyCube=new THREE.CubeTextureLoader().setPath("./img/").load([  'px.jpg', 'nx.jpg',
+            'py.jpg', 'ny.jpg',
+            'pz.jpg', 'nz.jpg']);
+        scene.background=skyCube;
+
+        let loader = new THREE.TextureLoader();
+        let groundTexture = loader.load( './img/grasslight-big.jpg' );
+        groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+        groundTexture.repeat.set( 25, 25 );
+        groundTexture.anisotropy = 16;
+        let groundMaterial = new THREE.MeshLambertMaterial( { map: groundTexture } );
+        let mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 25000, 25000 ), groundMaterial );
+        mesh.position.y = 0;
+        mesh.rotation.x = - Math.PI / 2;
+        mesh.receiveShadow = true;
+        scene.add( mesh );
+        let OBJloader=new OBJLoader();
+        OBJloader.load("./obj/building.obj",function (obj) {
+            obj.rotation.x=-Math.PI/2;
+            obj.position.set(-1000,0,1000);
+            obj.scale.set(500,500,500);//缩小为原来0.5倍
+          scene.add(obj);
+        } );
+       console.log(scene);
+        status=new Stats();//创建频率显示
+        container.appendChild(status.dom);//频率挂到左上角
+
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+
+        contorl.maxPolarAngle=Math.PI * 0.45; //最大仰视角和俯视角
+        contorl.minPolarAngle=Math.PI*0.3;
+        contorl.update();
+
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        let r = Date.now() * 0.00009;
+        camera.position.x = 3500 * Math.cos( r );
+        camera.position.z = 4000 * Math.sin( r );
+        directionalLight.position.copy(camera.position);
+        camera.lookAt(scene.position);
+        renderer.render(scene,camera);
+        status.update();
+    }
+    </script>
+</body>
+</html>

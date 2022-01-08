@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--质感贴图</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:black;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+
+<script type="x-shader/x-vertex" id="vertexShader">
+			varying vec3 vWorldPosition;
+			void main() {
+				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+				vWorldPosition = worldPosition.xyz;//获取x、y、z坐标
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );//转换坐标系
+			}
+</script>
+<script type="x-shader/x-fragment" id="fragmentShader">
+			uniform vec3 topColor;
+			uniform vec3 bottomColor;
+			uniform float offset;
+			uniform float exponent;
+			varying vec3 vWorldPosition;
+			void main() {
+				float h = normalize( vWorldPosition + offset ).y;//归一化函数
+				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h, 0.0 ), exponent ), 0.0 ) ), 1.0 );//返回第一个参数和第二个参数的线性混合 x*(1-a)+y*a
+			}
+</script>
+
+
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+    import { GUI } from './js/dat.gui.module.js';
+    import Stats from './js/stats.module.js';
+    let renderer,scene,camera,spotLight,status;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+        camera.position.set(0, 0, 500);//创建相机并设置位置
+
+        //let ambientLight=new THREE.AmbientLight();//添加环境光
+        //scene.add(ambientLight);
+
+        /*spotLight=new THREE.SpotLight( 0xaabbff);//添加点光源
+        spotLight.position.set(-60, 300,30);
+        spotLight.intensity=1;
+        scene.add(spotLight);*/
+        let light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
+        light.position.x = 300;
+        light.position.y = 250;
+        light.position.z = - 500;
+        scene.add( light );
+        //let spotLightMesh=new THREE.Mesh(new THREE.SphereGeometry(1,20,20),new THREE.MeshBasicMaterial());
+        //spotLight.add(spotLightMesh);
+
+        //let gridHelper=new THREE.GridHelper(30,20);
+        //scene.add(gridHelper);
+
+        let uniforms = {
+            topColor: { value: new THREE.Color( 0x0077ff ) },
+            bottomColor: { value: new THREE.Color( 0xffffff ) },
+            offset: {value: 400},
+            exponent: {value: 0.6}
+        };
+        uniforms.topColor.value.copy( light.color );
+        let skySphere=new THREE.SphereBufferGeometry(4000,40,40);//创建天空球形
+        let skyMaterial=new THREE.ShaderMaterial({//自定义天空着色器
+            uniforms:uniforms,
+            vertexShader:document.getElementById("vertexShader").textContent,
+            fragmentShader:document.getElementById("fragmentShader").textContent,
+            side:THREE.BackSide
+        });
+        //console.log(skyMaterial);
+        let skyMesh=new THREE.Mesh(skySphere,skyMaterial);
+        scene.add(skyMesh);
+
+        //加载JSON数组
+        let jsonLoader=new THREE.ObjectLoader().load("./json/lightmap.json",function (obj) {
+            console.log(obj);
+            scene.add(obj);
+        });
+
+
+
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        //renderer.autoClear=false;
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        let guiControls=new function(){
+            this.Cube=function () {
+
+            };
+            this.Equirectangular=function () {
+
+            }
+        };
+
+        let gui=new GUI();//创建gui
+        gui.add(guiControls,'Cube');
+        gui.add(guiControls,'Equirectangular');
+
+        status=new Stats();//创建频率显示
+        container.appendChild(status.dom);//频率挂到左上角
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        renderer.render(scene,camera);
+        status.update();
+    }
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="7d30a3f9-20eb-47c6-ab99-0b9ba629b16d" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CSS File" />
+        <option value="JavaScript File" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1XuYkfS0nY215PrJSqSu1Mv39hH" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="E:/vue/example1" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\threeJS\three\img" />
+      <recent name="E:\threeJS\three\js" />
+      <recent name="E:\threeJS\three\video" />
+      <recent name="E:\threeJS\three\assets\js" />
+      <recent name="E:\threeJS\three\json" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\threeJS" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="6.2.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/three/6.2.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.6.2.html" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7d30a3f9-20eb-47c6-ab99-0b9ba629b16d" name="Default Changelist" comment="" />
+      <created>1581897590179</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1581897590179</updated>
+      <workItem from="1581897592719" duration="37703000" />
+      <workItem from="1581982417257" duration="35189000" />
+      <workItem from="1582069890524" duration="12177000" />
+      <workItem from="1582084703669" duration="31743000" />
+      <workItem from="1582156272173" duration="40575000" />
+      <workItem from="1582245107813" duration="19701000" />
+      <workItem from="1582329974428" duration="4994000" />
+      <workItem from="1582339045729" duration="2540000" />
+      <workItem from="1582342486194" duration="11443000" />
+      <workItem from="1586050921607" duration="3188000" />
+      <workItem from="1586055718734" duration="2322000" />
+      <workItem from="1587611228888" duration="31758000" />
+      <workItem from="1587728985518" duration="8461000" />
+      <workItem from="1587803767185" duration="41006000" />
+      <workItem from="1587945953442" duration="10765000" />
+      <workItem from="1587958284393" duration="96191000" />
+      <workItem from="1588303540066" duration="477000" />
+      <workItem from="1588314788764" duration="23084000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+</project>

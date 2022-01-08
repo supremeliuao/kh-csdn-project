@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1,maximum-scale=5,user-scalable=yes" />
+    <meta name="format-detection" content="telephone=no,email=no"/>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <title>Kinghiee-许昌市新型冠状病毒分布图</title>
+</head>
+<style>
+    *{
+        margin: 0;
+    }
+    html,body{
+        height: 100%;
+    }
+    #xuchang{
+        height: 100%;
+        background-color:rgba(47,79,79,0.95);
+    }
+    footer{
+        height: 45px;
+        font-size: 20px;
+        text-align: center;
+        position:absolute;
+        left:0;
+        right:0;
+        bottom:15px;
+        color:white;
+        font-weight: lighter;
+    }
+    @media screen and (max-width: 850px){/* 可视区域小于 850px, 设置更小font-size属性 */
+        footer{
+            font-size:8px;
+        }
+    }
+</style>
+<script src="../../js/axios.min.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../js/echarts.min.js"></script>
+<body>
+<div id="xuchang">
+
+</div>
+<footer>
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none; color:white;">豫ICP备19011386号-2</a>
+</footer>
+<script>
+  let app=new Vue({
+      el:"#xuchang",
+      methods:{
+      },
+      created(){
+          axios.get("./dataJson/xuchang/xuchang.json").then(res=>{
+              console.log(res);
+              echarts.registerMap('xuchangshi', res.data);
+              let chart = echarts.init(document.getElementById('xuchang'));
+              chart.setOption({
+                  title: [
+                      {
+                          text:'许昌市新型冠状病毒实时数据分布图',
+                          textStyle:{
+                              fontSize:20,
+                              color:"white"
+                          },
+						  subtext: '点击跳转河南省疫情分布图',
+                          sublink: './henan.html',
+                          subtextStyle:{
+                              fontSize:10
+                          }
+                      }
+                  ],
+                  visualMap: {
+                      type: 'piecewise',                  // 定义为分段型 visualMap
+                      realtime: false,
+                      splitNumber:4,                      //对于连续型数据，自动平均切分成几段。默认为5段
+                      pieces: [                           //自定义『分段式视觉映射组件（visualMapPiecewise）』的每一段的范围，以及每一段的文字，以及每一段的特别的样式
+                          {min:10,color:'#2F0000',label:`>10人`},
+                          {min:5,max:10,color:'#600000',label:`5-10人`},
+                          {min:2, max: 5,color:'#AE0000',label:`2-5人`},
+                          {min:0, max: 2,color:'#EA0000',label:`0-2人`},
+                      ],
+
+                      itemGap:2,
+                  },
+
+                  series: [{
+                      type: 'map',
+                      map: 'xuchangshi',
+                      label: {
+                          show: true,
+                          color:"rgba(220,220,220,0.8)",
+                          backgroundColor:"rgba(0,139,139,0.5)",
+                          borderWidth:0.5,
+                          padding:6,
+                          shadowBlur:2,
+                          borderRadius:5,
+                          borderColor:"rgba(47,79,79,0.8)",
+                          fontFamily:"monospace",
+                          fontWeight:"lighter",
+                          formatter:function(params){return (`地区:${params.data.name}\n确诊案例:${params.data.value}\n现有案例:${params.data.datas[0]}\n死亡人数:${params.data.datas[1]}`)
+                          },
+                          backgroundColor:'rgba(50,50,50,0.7)'
+                      },
+                      emphasis:{
+                          label:{
+                              color:"white"
+                          },
+                          itemStyle:{
+                              areaColor:"rgba(0,128,128,0.8)"
+                          }
+                      },
+                      data:[
+                          {name:"襄城县",value:6,datas:[0,0],},
+                          {name:"鄢陵县",value:0,datas:[0,0]},
+                          {name:"长葛市",value:1,datas:[0,0]},
+                          {name:"禹州市",value:1,datas:[0,0]},
+                          {name:"魏都区",value:9,datas:[0,0]},
+                          {name:"建安区",value:22,datas:[0,1],label:{distance :10,position:'right'}},
+                      ]
+                  }]
+              });
+          })
+      }
+  })
+</script>
+</body>
+</html>

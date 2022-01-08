@@ -1,0 +1,344 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+.position_mix {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  z-index: 2;
+  height: 5vw;
+  width: 5vw;
+  background-color: rgba(141, 141, 141, 0.5);
+  text-align: center;
+  line-height: 5vw;
+  cursor: pointer;
+}
+.position_mix i {
+  font-size: 50px;
+  color: rgba(141, 141, 141, 0.6);
+}
+.position_mix:hover {
+  transition: all ease-in 0.6s;
+  background-color: rgba(141, 141, 141, 0.8);
+}
+.position_mix i:hover {
+  transition: all ease-in 0.6s;
+  color: black;
+}
+.header_fixed {
+  position: fixed;
+  width: 100%;
+  z-index: 5;
+  box-shadow: 1px 1px 5px 2px rgba(105, 105, 105, 0.5);
+  transition: all ease-in-out 1s;
+}
+.search-field {
+  border: 2px solid #DDD;
+  border-radius: 5px;
+  cursor: pointer;
+  height: 40px;
+  margin: 3px 0;
+  padding: 0 0 0 40px;
+  position: relative;
+  top: 5px;
+  transition: width 400ms ease, background 400ms ease;
+  width: 0;
+  background: url('../img/search.svg') no-repeat 12px center;
+}
+.search-field:focus {
+  background-color: #fff;
+  border: 2px solid #c3c0ab;
+  cursor: text;
+  outline: 0;
+  width: 300px;
+  font-weight: lighter;
+}
+.swiper-container {
+  width: 100%;
+  min-height: 500px;
+  max-height: 580px;
+  --swiper-theme-color: #ff6600;
+  --swiper-pagination-color: #5FB878;
+  /* 两种都可以 */
+}
+.swiper-container img {
+  width: 100%;
+  min-height: 500px;
+  max-height: 580px;
+}
+.notFound {
+  text-align: center;
+  padding: 1vw;
+}
+.notFound .notFoundText {
+  font-size: 1.5vw;
+  font-weight: lighter;
+  padding: 0.5vw;
+}
+.contentDiv {
+  padding: 1vw;
+  text-align: center;
+}
+.contentNull {
+  font-size: 1.5vw;
+  font-weight: lighter;
+}
+.production .production_title {
+  padding-top: 2vw;
+  font-weight: lighter;
+  font-size: 2vw;
+  text-align: center;
+  padding-bottom: 2vw;
+}
+.production .production_title span {
+  padding-bottom: 1vw;
+  border-bottom: 2px solid #009688;
+}
+.production .type_style {
+  padding: 1vw 2vw;
+}
+.production .type_style ul {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  text-align: center;
+}
+.production .type_style ul li {
+  border-radius: 5px 5px 0 0;
+  flex: 1 1 auto;
+  margin: 0 0.5vw;
+  padding: 0.8vw 1vw;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-size: 1.2vw;
+  font-weight: lighter;
+  position: relative;
+}
+.production .type_style ul li a {
+  height: 2.5vw ;
+  line-height: 2.5vw;
+}
+.production .type_style ul li::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  /*靠最左边开始*/
+  border-bottom: 2px solid #009688;
+  /*设置底部边颜色*/
+  width: 0;
+  /*宽度为0，这里的宽度是相对与li的宽度*/
+  height: 100%;
+  /*设置高度使它和li等高*/
+}
+.production .type_style ul li:hover::before {
+  pointer-events: none;
+  width: 100%;
+  transition: 0.3s all linear;
+  /*设置过度时间*/
+  transition-delay: 0.2s;
+  /*过度延时*/
+}
+.production .floor_style {
+  border: 1px solid #009688;
+  border-radius: 5px;
+  position: fixed;
+  top: 5vw;
+  right: 0.5vw;
+  z-index: 999;
+  padding: 1vw;
+  text-align: center;
+  font-size: 1vw;
+  box-shadow: 1px 1px 5px 2px rgba(105, 105, 105, 0.5);
+  transition: all ease-in-out 1s;
+}
+.production .floor_style div {
+  padding: 0.5vw 0;
+  border-bottom: 2px solid transparent;
+  transition: all ease-in-out 0.5s;
+}
+.production .floor_style div:hover {
+  transition: all ease-in-out 0.5s;
+  color: #009688;
+  cursor: pointer;
+  border-bottom: 2px solid #009688;
+}
+.production .floor_style .floor_show {
+  color: #009688;
+  border-bottom: 2px solid #009688;
+}
+.production .card_section_sum {
+  padding: 1vw 2vw;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 1vw;
+}
+.production .card_section_sum .card {
+  width: 18%;
+  box-shadow: 1px 1px 5px 2px rgba(105, 105, 105, 0.5);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 1vw;
+  text-align: center;
+  margin-left: 2vw;
+  margin-right: 2vw;
+  margin-bottom: 2vw;
+}
+.production .card_section_sum .card img {
+  width: 100%;
+  min-height: 17vw;
+  max-height: 20vw;
+}
+.production .card_section_sum .card .production_details .production_kind {
+  text-align: left;
+  float: left;
+}
+.production .card_section_sum .card .production_details .Yuan_symbol {
+  font-weight: lighter;
+  font-size: 20px;
+  line-height: 20px;
+}
+.production .card_section_sum .card .production_details .Yuan {
+  float: right;
+  font-size: 20px;
+  line-height: 20px;
+  color: rgba(105, 105, 105, 0.8);
+}
+.production .card_section_sum .card .production_details .production_price {
+  text-align: right;
+}
+.production .card_section_sum .card .production_title_title {
+  font-size: 16px;
+  color: #303030;
+  padding: .5vw;
+  font-weight: lighter;
+}
+.production .card_section_sum .card:hover {
+  -webkit-transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
+  transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
+  box-shadow: 1px 1px 5px 2px rgba(105, 105, 105, 0.8);
+  transform: translate(0, -5px);
+  transition-delay: 0s !important;
+  cursor: pointer;
+}
+.production .card_section {
+  padding: 1vw 2vw;
+  position: relative;
+}
+.production .card_section .card_typeTwo {
+  padding: 2vw 1vw;
+  text-align: center;
+  font-size: 1.8vw;
+  font-weight: lighter;
+}
+.production .card_section .card_div {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 1vw;
+}
+.production .card_section .card_div .card {
+  width: 18%;
+  box-shadow: 1px 1px 5px 2px rgba(105, 105, 105, 0.5);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 1vw;
+  text-align: center;
+  margin-left: 1.6vw;
+  margin-right: 1.6vw;
+  margin-bottom: 2vw;
+}
+.production .card_section .card_div .card img {
+  width: 100%;
+  min-height: 17vw;
+  max-height: 20vw;
+}
+.production .card_section .card_div .card .production_details .production_kind {
+  text-align: left;
+  float: left;
+}
+.production .card_section .card_div .card .production_details .Yuan_symbol {
+  font-weight: lighter;
+  font-size: 20px;
+  line-height: 20px;
+}
+.production .card_section .card_div .card .production_details .Yuan {
+  float: right;
+  font-size: 20px;
+  line-height: 20px;
+  color: rgba(105, 105, 105, 0.8);
+}
+.production .card_section .card_div .card .production_details .production_price {
+  text-align: right;
+}
+.production .card_section .card_div .card .production_title_title {
+  font-size: 16px;
+  color: #303030;
+  padding: .5vw;
+  font-weight: lighter;
+}
+.production .card_section .card_div .card:hover {
+  -webkit-transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
+  transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
+  box-shadow: 1px 1px 5px 2px rgba(105, 105, 105, 0.8);
+  transform: translate(0, -5px);
+  transition-delay: 0s !important;
+  cursor: pointer;
+}
+.router-link-exact-active {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  background-color: #009688;
+  color: rgba(220, 220, 220, 0.8);
+}
+.return_top {
+  height: 5vw;
+  width: 5vw;
+  line-height: 5vw;
+  position: fixed;
+  bottom: 3vw;
+  right: 1vw;
+  z-index: 2;
+  text-align: center;
+  cursor: pointer;
+  transition: all 2s cubic-bezier(0.14, 1.07, 0.645, 0.18);
+  background-color: #c3c0ab;
+  border-radius: 4px;
+}
+.return_top i {
+  font-size: 5vw;
+  color: rgba(141, 141, 141, 0.6);
+}
+.return_top:hover {
+  -webkit-transition: all 1s cubic-bezier(0.14, 1, 0.645, 0.18);
+  /* older webkit */
+  -webkit-transition: all 1s cubic-bezier(0.14, 1.07, 0.645, 0.18);
+  -moz-transition: all 1s cubic-bezier(0.14, 1.07, 0.645, 0.18);
+  -o-transition: all 1s cubic-bezier(0.14, 1.07, 0.645, 0.18);
+  transition: all 1s cubic-bezier(0.14, 1.07, 0.645, 0.18);
+  background-color: rgba(141, 141, 141, 0.8);
+}
+.return_top i:hover {
+  color: black;
+  -webkit-transition: all 1s cubic-bezier(0.14, 1, 0.645, 0.18);
+  /* older webkit */
+  -webkit-transition: all 1s cubic-bezier(0.14, 1.07, 0.645, 0.18);
+  -moz-transition: all 1s cubic-bezier(0.14, 1.07, 0.645, 0.18);
+  -o-transition: all 1s cubic-bezier(0.14, 1.07, 0.645, 0.18);
+  transition: all 1s cubic-bezier(0.14, 1.07, 0.645, 0.18);
+}

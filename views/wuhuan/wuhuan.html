@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kinghiee-五环</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1,maximum-scale=1,user-scalable=yes" />
+    <meta name="format-detection" content="telephone=no,email=no"/>
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <script src="../../js/jquery-3.3.1.js"></script>
+    <style>
+        body{
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: smaller;
+            text-align: center;
+            color: white;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+
+    </style>
+</head>
+<body>
+<div id="webGL"></div>
+<div id="Stats-output"></div>
+<footer>
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="../../img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;color:white;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "../../js/three.module.js";
+    import Stats from "../../js/stats.module.js";
+    import {GUI} from "../../js/dat.gui.module.js";
+    import {OrbitControls} from "../../js/OrbitControls.js";
+    let render,scene,camera,camera2,stats,spotlight,gui,torusBlue,step,orbitControls;
+    action();
+    function action() {//初始化函数
+        init();
+        initScene();
+        initStats();
+    }
+
+    function init() {
+        scene=new THREE.Scene();
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,1000);
+        camera.position.set(0,10,50);
+        camera.lookAt(scene.position);
+        camera2=new THREE.PerspectiveCamera(45,1,0.1,1000);//创建第二个相机
+        camera2.position.copy(camera.position);//复制第一个相机的位置，保证两个相机在同一角度照的是同一物体
+        /*let axe=new THREE.AxesHelper(20);
+        scene.add(axe);*/
+
+        let torusGeometryBlue=new THREE.TorusBufferGeometry(5,0.5,20,250,2*Math.PI);
+        let torusMaterial=new THREE.MeshPhongMaterial({color: "#1E90FF",emissive:0x1E90FF});
+        torusBlue=new THREE.Mesh(torusGeometryBlue,torusMaterial);//蓝
+        torusBlue.position.set(-14,6,0);
+        scene.add(torusBlue);
+
+        let torusGeometryBlack=new THREE.TorusBufferGeometry(5,0.5,20,250,2*Math.PI);
+        let torusMaterialBlack=new THREE.MeshPhongMaterial({color: "#000000",emissive: 0x000000});
+        let torusBlack=new THREE.Mesh(torusGeometryBlack,torusMaterialBlack);//黑
+        torusBlack.position.set(-2,6,0);
+        scene.add(torusBlack);
+
+        let torusGeometryYellow=new THREE.TorusBufferGeometry(5,0.58,20,250,2*Math.PI);
+        let torusMaterialYellow=new THREE.MeshPhongMaterial({color: "#FFD700",emissive: 0xFFD700});
+        let torusYellow=new THREE.Mesh(torusGeometryYellow,torusMaterialYellow);//黄
+        torusYellow.position.set(-8,0,0);
+        scene.add(torusYellow);
+
+        let torusGeometryGreen=new THREE.TorusBufferGeometry(5,0.58,20,250,2*Math.PI);
+        let torusMaterialGreen=new THREE.MeshPhongMaterial({color: "#228B22",emissive: 0x228B22});
+        let torusGreen=new THREE.Mesh(torusGeometryGreen,torusMaterialGreen);//绿
+        torusGreen.position.set(4,0,0);
+        scene.add(torusGreen);
+
+        let torusGeometryRed=new THREE.TorusBufferGeometry(5,0.5,20,250,2*Math.PI);
+        let torusMaterialRed=new THREE.MeshPhongMaterial({color: "#FF0000",emissive: 0xFF0000});
+        let torusRed=new THREE.Mesh(torusGeometryRed,torusMaterialRed);//红
+        torusRed.position.set(10,6,0);
+        scene.add(torusRed);
+
+        /*let  torusKontGeometry=new THREE.TorusKnotBufferGeometry(5,1,100,100,1,5,5);
+        let torusKontMaterial=new THREE.MeshPhongMaterial({color: "#87CEEB",emissive: 0xFFFFFF});
+        let torus=new THREE.Mesh(torusKontGeometry,torusKontMaterial);
+        torus.position.set(-4,6,0);
+        scene.add(torus);*/
+
+        spotlight=new THREE.SpotLight("#FFFFFF");
+        spotlight.castShadow=true;
+        spotlight.target=torusBlue;
+        spotlight.intensity=3;
+        spotlight.position.set(15,5,15);
+        scene.add(spotlight);
+        spotlight.add(new THREE.Mesh(new THREE.SphereBufferGeometry(0.1,50,50),new THREE.MeshBasicMaterial({ color: 0xffffff})));
+
+        render=new THREE.WebGLRenderer({antialias:true});
+        render.shadowMap.enabled=true;
+        render.setSize(window.innerWidth,window.innerHeight);
+
+        $("#webGL").append(render.domElement);
+        stats=new Stats();
+        //initGUI();
+        window.addEventListener('resize',onWindowResize,false);//监听页面变化后从新调制相机
+        onWindowResize();
+        orbitControls=new OrbitControls(camera,render.domElement);
+    }
+    function initScene() {
+        stats.update();
+        let timer = 0.001 * Date.now();
+        spotlight.position.x = Math.sin(timer) * 20;
+        spotlight.position.y = 5;
+        spotlight.position.z = Math.cos(timer) * 15;
+        requestAnimationFrame(initScene);
+        render.setClearColor(0x000000,0);
+        render.setViewport( 0, 0, window.innerWidth, window.innerHeight );//记得加上，因为每次设置会变动
+        render.render(scene,camera);//主场景
+
+        render.setClearColor(0x222222, 1 );//副场景
+        render.clearDepth();
+        render.setScissorTest(true);//启动剪切测试.被激活时，只有裁剪区域内的像素会被进一步的渲染行为所影响。
+        /*注：setViewport 和 setScissor 方法中的(x,y)是该区域的左下角。该区域被定义从左到右的宽度，以及从底部到顶部的高度。该垂直方向的定义和HTML canvas元素的填充方向相反。*/
+        render.setScissor(20,20,window.innerWidth/4,window.innerHeight/4);// 设置剪裁区域，从(x,y)到(x+width,y+height)
+        render.setViewport(20,20,window.innerWidth/4,window.innerHeight/4);//设置视口，从(x,y)到(x+width,y+height)
+        camera2.position.copy( camera.position );
+        camera2.quaternion.copy( camera.quaternion );
+        render.render(scene,camera2);//渲染第二个相机
+        render.setScissorTest(false);//关闭剪切测试
+    }
+    function initStats() {
+        stats.domElement.style.position="absolute";
+        stats.domElement.style.left="0px";
+        stats.domElement.style.top="0px";
+        $("#Stats-output").append(stats.domElement);
+    }
+    function onWindowResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();//更新相机
+        render.setSize( window.innerWidth, window.innerHeight );
+
+        camera2.aspect = (window.innerWidth/4)/(window.innerHeight/4);
+        camera2.updateProjectionMatrix();
+    }
+    function initGUI() {
+        gui=new GUI();
+        let controls=new function () {
+          this.radius=1;
+        };
+        gui.add(controls,'radius',0,10).onChange(value=>{torus.geometry.parameters.radius=value; });
+    }
+</script>
+
+</body>
+</html>

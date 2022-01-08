@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kinghiee——shopping</title>
+    <script src="../../js/vue.js"></script>
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <script src="../../layui/layui.js"></script>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/swiper.css">
+    <script src="js/swiper.js"></script>
+    <script src="../../js/axios.min.js"></script>
+    <script src="../../js/vue-router.js"></script>
+</head>
+<body>
+<div id="Vue">
+    <!--导航-->
+    <header v-bind:class="{'header_fixed':is_show_fixed}">
+        <ul class="layui-nav layui-bg-green" >
+            <li class="layui-nav-item layui-this"><a href="">首页</a> </li>
+            <li class="layui-nav-item"><a href="#">产品</a> </li>
+            <li class="layui-nav-item">
+                <a href="#">二级菜单</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="#">案例</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item layui-layout-right" >
+                <a href="#" style="display: inline-block" v-on:click="skipLogin" >登陆/注册</a>
+            </li>
+        </ul>
+      <div style="text-align: right;position: absolute;top: 0.12vw;right: 7.5vw">
+          <input placeholder="请输入要搜索的商品" class="search-field" style="display: inline-block;margin-left: 50vw;" v-on:keyup.enter="inputEnter" v-model="input_value">
+      </div>
+    </header>
+
+    <!--轮播-->
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide" v-for="(item,index) in IMG">
+                <img v-bind:src="item"  alt="">
+            </div>
+        </div>
+        <!-- 如果需要分页器 -->
+        <div class="swiper-pagination"></div>
+        <!-- 如果需要导航按钮 -->
+        <div class="swiper-button-prev " style="color:#009688"></div>
+        <div class="swiper-button-next " style="color:#009688"></div>
+    </div>
+
+    <!--商品-->
+    <div class="production">
+        <div class="production_title" >
+            <span >
+               商品展示
+            </span>
+        </div>
+        <div class="type_style">
+            <ul>
+                 <li v-for="(item,index) in typeSum"  ><router-link :to="'/type?item='+item" > {{item}}</router-link></li>
+            </ul>
+            <div style="clear: both"></div>
+        </div>
+        <router-view></router-view>
+    </div>
+
+
+    <!--返回顶部-->
+    <div class="return_top" v-if="btnFlag" v-on:click="backTop" >
+        <i class="layui-icon layui-icon-top" style="color: #009688;"></i>
+    </div>
+</div>
+
+<script>
+
+    //各类商品路由
+    let typeGoods={
+        data:function(){
+            return {
+               typeList:[],
+               typeTwoList:[],
+               floor_show:false,
+               count: 0,
+            }
+        },
+        methods:{
+            getTypeList(){
+                axios.get("http://vebcoder.cn:9527/api/goodList?type_one=" + this.$route.query.item).then(res => {
+                   //this.typeList=res.data;
+                   // console.log(res);
+                    let list=[];
+                    res.data.forEach(item=>{
+                        let flag=true;
+                        for (let i=0;i<list.length;i++)
+                        {
+                            if(list[i].type_two==item.type_two)
+                            {
+                                list[i].goods.push(item);
+                                flag=false;
+                            }
+                        }
+                        if(flag){
+                            list.push({
+                                type_two:item.type_two,
+                                goods:[item]
+                            })
+                        }
+                    });
+                    console.log(list);
+                    this.typeList=list;
+                });
+            },
+            imgError(event){//图片加载错误替换
+                event.target.src="./img/browser-404.svg"
+            },
+            scrollToTop () {
+                const that = this;
+                let scroll = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+                if (scroll > 600) {
+                    that.floor_show = true
+                } else {
+                    that.floor_show = false
+                }
+            },
+            floorScroll: function (index) {
+                this.count = index;
+                console.log(index);
+                // 对应主体内容的顶部偏移量
+                var content = document.getElementById("content");
+                var offsetTop = content.children[index].offsetTop;
+                let scrollTo=offsetTop +500;
+                // 实现滚动效果
+                const timeTop = setInterval(() => {
+                    document.body.scrollTop = document.documentElement.scrollTop = offsetTop+= 50;
+                    if (offsetTop >=scrollTo) {
+                        clearInterval(timeTop);
+                    }
+                }, 20);
+            }
+        },
+        created: function () {
+            this.getTypeList();
+            window.onscroll = ()=> {
+                var content=document.getElementById("content");
+                console.log(content.children.length);
+                for (var i = 0; i < content.children.length; i++) {
+                    var H = window.innerHeight;
+                    var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+                    var offsetTop = content.children[i].offsetTop;
+                    // 元素自身高度
+                    var offsetHeight = content.children[i].offsetHeight;
+                    console.log(H,scrollTop,offsetTop,offsetHeight);
+                    // 元素顶部在窗口中线以上  底部在中线以下
+                    if (offsetTop - scrollTop < H / 2 && scrollTop + H / 2 < offsetTop + offsetHeight) {
+                        // 找到处于视图区域的楼层
+                        this.count=i;
+                    }
+
+                }
+
+            }
+        },
+        mounted:function(){
+            window.addEventListener('scroll', this.scrollToTop,false);
+
+        },
+        watch:{
+            "$route":function(){
+                this.getTypeList();
+            }
+        },
+      template:`<div style="position: relative" >
+                    <div class="floor_style" v-if="floor_show">
+                         <div  v-for="(item,index) in typeList" :class="{floor_show:index==count}" @click="floorScroll(index)">{{item.type_two}}</div>
+                    </div>
+                   <div id="content">
+                    <div class="card_section" id="card_section"  v-for="item in typeList">
+                          <div class="card_typeTwo">{{item.type_two}}</div>
+                          <div class="card_div">
+                            <div class="card" v-for="index in item.goods">
+                                 <a :href="'./index6.html?item='+index.Id" target="_blank">
+                                                 <span  style="display: none">{{index.Id}}</span>
+                                                   <img :src="index.img_list_url" @error="imgError($event)">
+                                                 <div class="production_title_title">
+                                                             {{index.title}}
+                                                 </div>
+                                       <div class="production_details">
+                                           <div class="production_kind">
+                                               <span class="layui-bg-green">{{index.type_one}}</span>&nbsp;<span class="layui-bg-cyan">{{index.type_two}}</span>&nbsp; <p style="display: inline-block" v-html="index.mack"></p>
+                                            </div>
+                                           <div class="production_price">
+                                             <span class="Yuan_symbol">￥</span><span class="Yuan">{{index.price}}</span>
+                                           </div>
+                                         </div>
+                                  </a>
+                             </div>
+                          </div>
+                     </div>
+                    </div>
+                 </div>`
+    };
+
+    //首页商品总数据路由
+    let indexSum={
+        methods:{
+            imgError(event){//图片加载错误替换
+                event.target.src="./img/browser-404.svg"
+            },
+        },
+        created(){
+            layui.use('flow', function(){
+                let $ = layui.jquery;
+                let flow = layui.flow;
+                flow.load({
+                    elem: '#card_section', //指定列表容器
+                    done: function(page, next){ //到达临界点（默认滚动触发），触发下一页
+                        let lis = [];
+                        $.get('http://vebcoder.cn:9527/api/goodList?page='+page, function(res){
+                            console.log(res);
+                            layui.each(res, function(index, item){
+                                lis.push(`<div class="card" >
+                                                 <a href='./index6.html?item=${item.Id}' target="_blank">
+                                                 <span  style="display: none">${item.Id}</span>
+                                                 <img src="${item.img_list_url}"  >
+                                                 <div class="production_title_title">
+                                                   ${item.title}
+                                                 </div>
+                                       <div class="production_details">
+                                           <div class="production_kind">
+                                               <span class="layui-bg-green">${item.type_one}</span>&nbsp;<span class="layui-bg-cyan">${item.type_two}</span>&nbsp;${item.mack}
+                                            </div>
+                                           <div class="production_price">
+                                             <span class="Yuan_symbol">￥</span><span class="Yuan">${item.price}</span>
+                                           </div>
+                                         </div>
+                                     </a></div>`);
+                            });
+                            next(lis.join(''), page < 43);
+                        });
+                    },
+                    end:"<div style='position: absolute;bottom: 0;left: 0;right: 0'><h2 >没有更多了</h2></div>",
+                });
+            });
+        },
+        template: `<div class="card_section_sum" id="card_section" ></div>`
+    };
+
+    //搜索路由
+    let search={
+        data(){
+            return {
+                word: false,
+                searchCard:false,
+                data:[],
+            }
+        },
+        methods:{
+          getData(){
+              axios.get("http://vebcoder.cn:9527/api/search?word="+this.$route.params.word).then((res) =>{
+                  console.log(res);
+                  this.data=res.data;
+                  if(this.data.length==0)
+                  {
+                      this.word=true;
+                      this.searchCard=false;
+                  }else {
+                      this.word=false;
+                      this.searchCard=true;
+                  }
+              })
+          },
+          imgError(event){//图片加载错误替换
+                event.target.src="./img/browser-404.svg"
+            },
+        },
+        mounted(){
+            console.log(this.$route.params);
+            console.log(this.$route.params.word=="null");
+          if(this.$route.params.word==="null")
+            {
+                this.word=true;
+                this.searchCard=false;
+            }else {
+              this.word=false;
+              this.getData();
+              this.searchCard=true;
+          }
+        },
+        watch: {
+            "$route": function () {
+                console.log(this.$route.params);
+                if(this.$route.params.word==="null")
+                {
+                    this.word=true;
+                    this.searchCard=false;
+                }else {
+                    this.word=false;
+                    this.getData();
+                    this.searchCard=true;
+                }
+            },
+        },
+        template:`<div>
+                      <div class="contentDiv" v-if="word">
+                        <div ><img src="./img/null.svg" ></div>
+                       <div class="contentNull">哇哦o((⊙﹏⊙))o.搜不到</div>
+                     </div>
+                     <div class="card_section_sum" id="card_section" v-if="searchCard">
+                       <div class="card" v-for="item in data">
+                                    <a :href="'./index6.html?item='+item.Id" target="_blank">
+                                                 <span  style="display: none">{{item.Id}}</span>
+                                                 <img :src=item.img_list_url @error="imgError($event)">
+                                                 <div class="production_title_title">
+                                                   {{item.title}}
+                                                 </div>
+                                       <div class="production_details">
+                                           <div class="production_kind">
+                                               <span class="layui-bg-green">{{item.type_one}}</span>&nbsp;<span class="layui-bg-cyan">{{item.type_two}}</span>&nbsp;<p style="display: inline-block" v-html="item.mack"></p>
+                                            </div>
+                                           <div class="production_price">
+                                             <span class="Yuan_symbol">￥</span><span class="Yuan">{{item.price}}</span>
+                                           </div>
+                                       </div>
+                                   </a>
+                       </div>
+                      </div>
+                  </div>`
+    };
+
+    //404路由
+    let notFind={
+      template:`<div class="notFound">
+                     <div ><img src="./img/browser-404.svg"> </div>
+                     <div class="notFoundText">哇哦~好像找不到你想要的资源╯︿╰</div>
+                    </div>`
+    };
+
+    //程序入口
+    let vue=new Vue({
+        el:"#Vue",
+        data:{
+            IMG:["./img/Hieescenery11.jpg","./img/Hieescenery12.jpg","./img/Hieescenery13.jpg","./img/Hieescenery14.jpg"],
+            IMG_index:0,
+            list:[],
+            scroll_data:'',
+            btnFlag:false,
+            typeSum:[],
+            isTrue:null,
+            is_show_fixed:false,
+            header_height:null,
+            input_value:null
+        },
+        methods:{
+            next:function () {
+                this.IMG_index++;
+                // 判断末尾临近点
+                if(this.IMG_index>this.IMG.length-1){
+                    this.IMG_index=0;
+                }
+            },
+            pre:function () {
+                this.IMG_index--;
+                if(this.IMG_index<0){
+                    this.IMG_index=this.IMG.length-1;
+                }
+            },
+            // 点击图片回到顶部方法，加计时器是为了过渡顺滑
+            backTop () {
+                const that = this;
+                let timer = setInterval(() => {
+                    let ispeed = Math.floor(-that.scroll_data / 5);
+                    document.documentElement.scrollTop = document.body.scrollTop = that.scroll_data + ispeed;
+                    if (that.scroll_data === 0) {
+                        clearInterval(timer)
+                    }
+                }, 30);
+            },
+            // 为了计算距离顶部的高度，当高度大于60显示回顶部图标，小于60则隐藏
+            scrollToTop () {
+                const that = this;
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+                that.scroll_data = scrollTop;
+                if (that.scroll_data > 1000) {
+                    that.btnFlag = true
+                } else {
+                    that.btnFlag = false
+                }
+            },
+            headerFixed(){
+                let scroll = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+                if (scroll > this.header_height) {
+                    this.is_show_fixed = true
+                } else {
+                    this.is_show_fixed = false
+                }
+            },
+            skipLogin:function () {//页面跳转
+                window.open("./login.html");
+            },
+            inputEnter(){//搜索事件
+                let patrn = /[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]/im;
+                if (patrn.test(this.input_value)) {
+                    alert("请不要输入特殊字符");
+                    return ;
+                }else {
+                    window.location.href=window.location.origin+window.location.pathname+window.location.search+"#/search/"+this.input_value;
+                }
+            }
+        },
+        created:function () {
+            this.$nextTick(()=> {
+                axios.get("http://vebcoder.cn:9527/api/getTypeone").then((res) =>{
+                    this.typeSum=res.data;
+                })
+            })
+        },
+        mounted:function () {
+            window.addEventListener('scroll', this.scrollToTop,false);//监听滑轮
+            this.header_height=document.getElementsByTagName("header")[0].offsetHeight;//获取header高度
+            window.addEventListener('scroll', this.headerFixed,false);//监听滑轮
+            new Swiper ('.swiper-container', {
+                direction: 'horizontal', // 垂直切换选项
+                loop: true, // 循环模式选项
+                grabCursor:true,
+                preloadImages:false,
+                autoplay:true,
+                 // 如果需要分页器
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true
+                },
+                // 如果需要前进后退按钮
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            });
+        },
+      router:new VueRouter({//路由绑定
+          routes:[
+              {
+                  path:"/",
+                  component:indexSum
+              },
+              {
+                  path:"/type",
+                  component:typeGoods
+              },
+              {
+                  path:"/search/:word",
+                  component:search
+              },
+              {
+                  path:"*",
+                  component:notFind
+              }
+          ]
+
+      })
+    });
+    layui.use('element', function(){
+        let element = layui.element;
+    });
+
+</script>
+
+</body>
+</html>

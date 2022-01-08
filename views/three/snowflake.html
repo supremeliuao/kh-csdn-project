@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--雪花</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:white;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 5vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+    import Stats from './js/stats.module.js';
+    let renderer,scene,camera,spotLight,status;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+        scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );//设置雾
+
+        camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,1,10000);
+        camera.position.set(20,30,25);//创建相机并设置位置
+        camera.lookAt(scene.position);
+
+
+
+        //let axe=new THREE.AxesHelper(20);
+       // scene.add(axe);//辅助工具，用于创建相机时，相机找到合适的位置
+
+        //let ambientLight=new THREE.AmbientLight();
+        //scene.add(ambientLight);
+
+        /*spotLight=new THREE.SpotLight(0xffffff);
+        spotLight.position.set(0, 5,20);
+        spotLight.intensity=2;
+        scene.add(spotLight);
+        let spotLightMesh=new THREE.Mesh(new THREE.SphereGeometry(0.125,20,20),new THREE.MeshBasicMaterial());
+        spotLight.add(spotLightMesh);*/
+
+        //let gridHelper=new THREE.GridHelper(30,20);
+        //scene.add(gridHelper);
+
+        let spriteGeometry=new THREE.BufferGeometry();//生成几何体
+        let spriteTextureLoad=new THREE.TextureLoader();//创建纹理加载器
+
+        let spriteTexture1=spriteTextureLoad.load("./img/snowflake1.png");
+        let spriteTexture2=spriteTextureLoad.load("./img/snowflake2.png");
+        let spriteTexture3=spriteTextureLoad.load("./img/snowflake3.png");
+        let spriteTexture4=spriteTextureLoad.load("./img/snowflake4.png");
+        let spriteTexture5=spriteTextureLoad.load("./img/snowflake5.png");
+
+        let vertices=[];//用于存储随机生成的点
+
+        for(let i=0;i<10000;i++)
+        {
+            let x=Math.random()*2000-1000;
+            let y=Math.random()*2000-1000;
+            let z=Math.random()*2000-1000;
+            vertices.push(x,y,z);
+        }
+       spriteGeometry.addAttribute('position',new THREE.Float32BufferAttribute(vertices,3));//传入顶点数据
+
+        let color1=new THREE.Color();
+        color1.setHSL( 0.90, 0.05, 0.5);
+        let spriteMaterial1=new THREE.PointsMaterial({size:10,map:spriteTexture1,blending:THREE.AdditiveBlending,transparent:true,color:color1,depthWrite:false});//创建材质
+        let sprite1=new THREE.Points(spriteGeometry,spriteMaterial1);
+        sprite1.rotation.x = Math.random() * 6;//为了和其他雪花错开位置
+        sprite1.rotation.y = Math.random() * 6;
+        sprite1.rotation.z = Math.random() * 6;
+        scene.add(sprite1);
+
+        color1.setHSL(1.0, 0.2, 0.5);
+        let spriteMaterial2=new THREE.PointsMaterial({size:20,map:spriteTexture2,blending: THREE.AdditiveBlending,transparent: true,color:color1,depthWrite:false});
+        let sprite2=new THREE.Points(spriteGeometry,spriteMaterial2);
+        sprite2.rotation.x = Math.random() * 6;//为了和其他雪花错开位置
+        sprite2.rotation.y = Math.random() * 6;
+        sprite2.rotation.z = Math.random() * 6;
+        scene.add(sprite2);
+
+        color1.setHSL( 0.95, 0.1, 0.5);
+        let spriteMaterial3=new THREE.PointsMaterial({size:15,map:spriteTexture3,blending: THREE.AdditiveBlending,transparent: true,color:color1,depthWrite:false});
+        let sprite3=new THREE.Points(spriteGeometry,spriteMaterial3);
+        sprite3.rotation.x = Math.random() * 6;//为了和其他雪花错开位置
+        sprite3.rotation.y = Math.random() * 6;
+        sprite3.rotation.z = Math.random() * 6;
+        scene.add(sprite3);
+
+        color1.setHSL( 0.80, 0, 0.5);
+        let spriteMaterial4=new THREE.PointsMaterial({size:5,map:spriteTexture4,blending: THREE.AdditiveBlending,transparent: true,color:color1,depthWrite:false});
+        let sprite4=new THREE.Points(spriteGeometry,spriteMaterial4);
+        sprite4.rotation.x = Math.random() * 6;//为了和其他雪花错开位置
+        sprite4.rotation.y = Math.random() * 6;
+        sprite4.rotation.z = Math.random() * 6;
+        scene.add(sprite4);
+
+        color1.setHSL( 0.80, 0, 0.5);
+        let spriteMaterial5=new THREE.PointsMaterial({size:5,map:spriteTexture5,blending: THREE.AdditiveBlending,transparent: true,color:color1,depthWrite:false});
+        let sprite5=new THREE.Points(spriteGeometry,spriteMaterial5);
+        sprite5.rotation.x = Math.random() * 6;//为了和其他雪花错开位置
+        sprite5.rotation.y = Math.random() * 6;
+        sprite5.rotation.z = Math.random() * 6;
+        scene.add(sprite5);
+        console.log(scene);
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        //renderer.shadowMap.enabled=true;//开启阴影
+        renderer.gammaInput=true;
+        renderer.gammaOutput=true;//inear转gamma
+        //renderer.setClearColor(0XEEEEEE);
+        //renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        status=new Stats();//创建频率显示
+        container.appendChild(status.dom);//频率挂到左上角
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+        window.addEventListener('resize',onResize,false);//浏览器大小改变监听
+    }
+    function onResize() {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    }
+
+    function run() {
+        requestAnimationFrame(run);
+        let time = Date.now() * 0.00003;
+        for ( let i = 0; i < scene.children.length; i ++ ) {
+
+            let object = scene.children[ i ];
+
+            if ( object instanceof THREE.Points ) {
+
+                object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
+
+            }
+
+        }
+        renderer.render(scene,camera);
+        status.update();
+    }
+
+
+</script>
+</body>
+</html>

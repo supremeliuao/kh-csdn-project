@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>kinghiee--六面贴图</title>
+    <meta name="viewport" content="width=1200, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <style>
+        html,body{
+            padding: 0;
+            margin: 0;
+        }
+        #container{
+            width: 100%;
+            height: 650px;
+            background-color: #000000;
+        }
+        footer{
+            height: 50px;
+            font-size: 1vw;
+            font-weight: lighter;
+            text-align: center;
+            color:black;
+            position: absolute;
+            z-index:1;
+            left: 0;
+            right: 0;
+            bottom: 6vh;
+        }
+        footer img{
+            min-width: 0.5vw;
+            max-width: 1vw;
+        }
+        footer a{
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+
+</div>
+<!--尾部-->
+<footer >
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;">豫ICP备19011386号-2</a>
+</footer>
+<script type="module">
+    import * as THREE from "./js/three.module.js";
+    import {OrbitControls} from "./js/OrbitControls.js";
+
+    let renderer,scene,camera,cube;
+
+    action();
+    function action() {
+        onload();
+        run();
+    }
+    function onload() {
+        let container=document.getElementById("container");//获取container
+
+        scene=new THREE.Scene();//创建场景
+
+        camera=new THREE.PerspectiveCamera(45,container.offsetWidth/container.offsetHeight,1,4000);
+        camera.position.set(8,8,8);//创建相机并设置位置
+
+        let axe=new THREE.AxesHelper(20);
+        scene.add(axe);//辅助工具，用于创建相机时，相机找到合适的位置
+
+
+
+        let ambientLight=new THREE.AmbientLight();
+        ambientLight.position.set(4,2,4);
+        scene.add(ambientLight);
+
+        let geometry=new THREE.CubeGeometry(5,5,5);
+        //let material=new THREE.MeshPhongMaterial({ambient:0x050505,color:0x0033ff,specular:0x555555,shininess:30});
+        let texture=new THREE.TextureLoader();
+        let cubeTexture=texture.load("./img/texture-atlas.jpg");
+        let material=new THREE.MeshPhongMaterial({map:cubeTexture});
+        let bricks=[new THREE.Vector2(0,.666),new THREE.Vector2(0.5,0.666),new THREE.Vector2(0.5,1),new THREE.Vector2(0,1)];
+        let clouds=[new THREE.Vector2(0.5,0.666),new THREE.Vector2(1,0.666),new THREE.Vector2(1,1),new THREE.Vector2(0.5,1)];
+        let crate=[new THREE.Vector2(0,0.333),new THREE.Vector2(0.5,0.333),new THREE.Vector2(0.5,0.666),new THREE.Vector2(0,0.666)];
+        let stone=[new THREE.Vector2(0.5,0.333),new THREE.Vector2(1,0.333),new THREE.Vector2(1,0.666),new THREE.Vector2(0.5,0.666)];
+        let water=[new THREE.Vector2(0,0),new THREE.Vector2(0.5,0),new THREE.Vector2(0.5,0.333),new THREE.Vector2(0,0.333)];
+        let wood=[new THREE.Vector2(0.5,0),new THREE.Vector2(1,0),new THREE.Vector2(1,0.333),new THREE.Vector2(0.5,0.333)];
+        geometry.faceVertexUvs[0][0]=[bricks[0],bricks[1],bricks[3]];
+        geometry.faceVertexUvs[0][1]=[bricks[1],bricks[2],bricks[3]];
+        geometry.faceVertexUvs[0][2]=[clouds[0],clouds[1],clouds[3]];
+        geometry.faceVertexUvs[0][3]=[clouds[1],clouds[2],clouds[3]];
+        geometry.faceVertexUvs[0][4]=[crate[0],crate[1],crate[3]];
+        geometry.faceVertexUvs[0][5]=[crate[1],crate[2],crate[3]];
+        geometry.faceVertexUvs[0][6]=[stone[0],stone[1],stone[3]];
+        geometry.faceVertexUvs[0][7]=[stone[1],stone[2],stone[3]];
+        geometry.faceVertexUvs[0][8]=[water[0],water[1],water[3]];
+        geometry.faceVertexUvs[0][9]=[water[1],water[2],water[3]];
+        geometry.faceVertexUvs[0][10]=[wood[0],wood[1],wood[3]];
+        geometry.faceVertexUvs[0][11]=[wood[1],wood[2],wood[3]];
+       /* let cubeTexture=texture.load("./img/1.jpg");
+        let brickTexture=texture.load("./img/bricks.jpg");
+        let cloudTexture=texture.load("./img/clouds.jpg");
+        let stoneWallTexture=texture.load("./img/stone-wall.jpg");
+        let waterTexture=texture.load("./img/water.jpg");
+        let woodFloorTexture=texture.load("./img/wood-floor.jpg");
+        let cubeMaterial=new THREE.MeshPhongMaterial({map:cubeTexture});
+        let brickMaterial=new THREE.MeshPhongMaterial({map:brickTexture});
+        let cloudMaterial=new THREE.MeshPhongMaterial({map:cloudTexture});
+        let stoneWallMaterial=new THREE.MeshPhongMaterial({map:stoneWallTexture});
+        let waterMaterial=new THREE.MeshPhongMaterial({map:waterTexture});
+        let woodFloorMaterial=new THREE.MeshPhongMaterial({map:woodFloorTexture});
+        let materials=[cubeMaterial,brickMaterial,cloudMaterial,stoneWallMaterial,waterMaterial,woodFloorMaterial];
+        let mesh=new THREE.Mesh(geometry,materials);*/
+        let mesh=new THREE.Mesh(geometry,material);
+        scene.add(mesh);
+
+        renderer=new THREE.WebGLRenderer({antialias:true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0xEEEEEE);
+        renderer.setSize(container.offsetWidth,container.offsetHeight);
+        container.appendChild(renderer.domElement);
+
+        let contorl=new OrbitControls(camera,renderer.domElement);//添加鼠标滚动缩放，旋转对象
+
+
+    }
+
+    function run() {
+
+        requestAnimationFrame(run);
+
+        renderer.render(scene,camera);
+
+    }
+
+
+</script>
+</body>
+</html>

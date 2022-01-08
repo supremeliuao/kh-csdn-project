@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1,maximum-scale=5,user-scalable=yes" />
+    <meta name="format-detection" content="telephone=no,email=no"/>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <title>Kinghiee-新型冠状病毒全国分布图</title>
+    <style>
+        *{
+            margin: 0;
+        }
+        html,body{
+            height: 100%;
+        }
+        #corona,#bar{
+            height: 100%;
+        }
+        footer{
+            height: 50px;
+            font-size: 20px;
+            text-align: center;
+        }
+        @media screen and (max-width: 850px){/* 可视区域小于 850px, 设置更小font-size属性 */
+            footer{
+                font-size:10px;
+            }
+        }
+    </style>
+    <script src="jsback/echarts.min.js"></script>
+</head>
+<body>
+<div id="corona"></div>
+<div id="bar"></div>
+<footer>
+    <p>Copyright © 2020 Kinghiee. All rights reserved. </p>
+    <img src="img/police.png">
+    <a href="http://www.beian.miit.gov.cn/" style="text-decoration:none;color:black;">豫ICP备19011386号-2</a>
+</footer>
+
+<script src="../../js/jquery-1.11.1.min.js"></script>
+<script src="../../js/echarts.min.js"></script>
+<script src="../../js/china.js"></script>
+<script>
+    const e =window.innerWidth;//根据屏幕宽度设置字体大小
+    (function () {
+        $.ajax({
+            url:'./dataJson/getOnsInfo.json',
+            type:'get',
+            cache:false,
+            dataType:'json',
+            success:function(data) {
+                console.log($.parseJSON( data.data));
+                let sumData=$.parseJSON( data.data);
+                let ChinaProvinces=sumData.areaTree[0].children;
+                console.log(ChinaProvinces);
+                let getData=dealData(ChinaProvinces);
+               console.log(getData);
+                chart(getData);
+                chartBar(getData);
+                /*if(data.errcode===0)
+                {
+                    let getData=dealData(data.data.area);
+                    chart(getData);
+                    chartBar(getData)
+                }else {
+                    alert('请求次数过于频繁，稍后再试吧~');
+                }*/
+            },
+            error : function() {
+                // view("异常！");
+                alert("异常！");
+            }
+        });
+        function dealData(data) {//数据处理函数
+            let realData = [];
+            let axisData=[];
+            for(let key in data){
+                let obj = {name:'', datas:[],label:{fontSize:e/850 *10,fontStyle:'lighter'}};
+                obj.name = data[key].name;
+                axisData.push(data[key].name);
+                obj.value = data[key].total.confirm;
+                obj.datas[0] = data[key].total.suspect;
+                obj.datas[1] = data[key].total.heal;
+                obj.datas[2] = data[key].total.dead;
+                realData.push(obj);
+            }
+            return {'realData':realData,'axisData':axisData};
+        }
+
+
+    }());
+    function chart(getRealData) {
+        console.log(getRealData.realData);
+        //初始化echarts实例
+        var myChart = echarts.init(document.getElementById('corona'));
+        //使用制定的配置项和数据显示图表
+        myChart.setOption(
+            {// 绘制图表，准备数据
+                title: [
+                    {
+                        text: getNowFormatDate()+'新型冠状病毒各省市实时数据分布图',
+                        textStyle:{
+                            fontSize:e/800 *20
+                           },
+                        subtext: '数据来源于https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5',
+                        sublink: 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5',
+                        subtextStyle:{
+                            fontSize:e/1000 *10
+                        }
+                    }
+                ],
+                toolbox: {
+                    show: true,
+                    orient: 'horizontal',
+                    left: 'right',
+                    top: 'top',
+                    itemSize:e/400 *5,
+                    feature: {
+                        dataView: {readOnly: false},
+                        restore: {},
+                        saveAsImage: {}
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(data){
+                        console.log(data);
+                        return (//`+
+                            `省份：${data.name}<br>
+                            确诊案例：${data.value}<br>
+                            疑似案例：${data.data.datas[0]}<br>
+                            治愈人数:${data.data.datas[1]}<br>
+                            死亡人数:${data.data.datas[2]}`
+                        )
+                    },
+                    backgroundColor:'rgba(50,50,50,0.7)'
+                },
+                color:['#AE0000'],
+                visualMap: {
+                    type: 'piecewise',                  // 定义为分段型 visualMap
+                    realtime: false,
+                    splitNumber:7,                      //对于连续型数据，自动平均切分成几段。默认为5段
+                    pieces: [                           //自定义『分段式视觉映射组件（visualMapPiecewise）』的每一段的范围，以及每一段的文字，以及每一段的特别的样式
+                        {min:10000,color:'#2F0000',label:`>10000人`},
+                        {min:getRealData.realData[3]['value'],max:getRealData.realData[1]['value'],color:'#600000',label:`${getRealData.realData[1]['value']}-${getRealData.realData[3]['value']}人`},
+                        {min:getRealData.realData[10]['value'], max:  getRealData.realData[4]['value'],color:'#AE0000',label:`${getRealData.realData[10]['value']}-${getRealData.realData[4]['value']}人`},
+                        {min:getRealData.realData[20]['value'], max:  getRealData.realData[11]['value'],color:'#EA0000',label:`${getRealData.realData[20]['value']}-${getRealData.realData[11]['value']}人`},
+                        {min:getRealData.realData[25]['value'], max:  getRealData.realData[21]['value'],color:'#FF2D2D',label:`${getRealData.realData[25]['value']}-${getRealData.realData[21]['value']}人`},
+                        {min:getRealData.realData[29]['value'], max:  getRealData.realData[26]['value'],color:'#FF5151',label:`${getRealData.realData[29]['value']}-${getRealData.realData[26]['value']}人`},
+                        {min:getRealData.realData[33]['value'], max:  getRealData.realData[30]['value'],color:'#FFD2D2',label:`${getRealData.realData[33]['value']}-${getRealData.realData[30]['value']}人`},
+                    ],
+                   textStyle:{
+                       fontSize:e/1000 *10,
+                   },
+                    itemGap:2,
+                },
+                series: [
+                    {
+                        name: '中国',
+                        type: 'map',
+                        mapType: 'china',
+                        itemStyle: {
+                            emphasis: {
+                                areaColor: '#FF0000'
+                            }
+                        },
+                        label: {
+                            show: true
+                        },
+                        data:getRealData.realData ,
+                    }
+                ]
+            });
+        window.onresize = myChart.resize;
+    }
+
+    function chartBar(barData) {
+        var chartBar = echarts.init(document.getElementById('bar'));
+        option = {
+        title:[
+            {
+             text: '截止到'+getNowFormatDate()+'各省市确诊案例总数排名',
+                textStyle:{
+                   fontSize:e/800 *20
+                     },
+                right:'10%',
+                top:'12%'
+           }
+           ],
+            tooltip: {
+                trigger: 'item',
+                axisPointer: {
+                    type: 'shadow',
+                    label: {
+                        show: true
+                    }
+                },
+                formatter: function(data){
+                    return (//`+
+                        `省份：${data.name}<br>
+                            确诊案例：${data.value}<br>
+                            疑似案例：${data.data.datas[0]}<br>
+                            治愈人数:${data.data.datas[1]}<br>
+                            死亡人数:${data.data.datas[2]}`
+                    )
+                },
+            },
+            calculable: true,
+            grid: {
+                top: '12%',
+                left: '1%',
+                right: '10%',
+                height:'60%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    axisLabel: {
+                        fontSize: e / 1000 * 10,
+                    },
+                    data:barData.axisData
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '确诊人数',
+
+                    axisLabel: {
+                        fontSize:e/1000 *10,
+                        formatter: function (a) {
+                           return a;
+                        }
+                    },
+                    nameTextStyle:{
+                        fontSize:e/1000 *15
+                    }
+                }
+            ],
+            dataZoom: [
+                {
+                    show: false,
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'inside',
+                    start: 0,
+                    end: 100
+                },
+                {
+                    show: false,
+                    yAxisIndex: 0,
+                    filterMode: 'empty',
+                    width: 30,
+                    height: '80%',
+                    showDataShadow: false,
+                    left: '93%'
+                }
+            ],
+            series: [
+                {
+                    name: '全国各省市确诊案例数据',
+                    type: 'bar',
+                    data:barData.realData,
+                    label: {
+                        show: true,
+                        position: 'top',
+                        fontSize:e/2000 ,
+                        fontWeight:'lighter'
+                    }
+                }
+            ]
+        };
+
+        chartBar.setOption(option);
+        window.onresize = chartBar.resize;
+    }
+    //获取当前时间，格式YYYY-MM-DD
+    function getNowFormatDate() {
+        let date = new Date();
+        let seperator1 = "-";
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let strDate = date.getDate();
+        let Hours=date.getHours();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        let currentdate = year + seperator1 + month + seperator1 +strDate+' '+Hours+'时';
+        return currentdate;
+    }
+
+</script>
+</body>
+</html>
